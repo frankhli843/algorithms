@@ -1,14 +1,4 @@
-146. LRU Cache
-Medium
-
-7825
-
-320
-
-Add to List
-
-Share
-Design a data structure that follows the constraints of a Least Recently Used (LRU) cache.
+# 146. LRU Cache
 
 Implement the LRUCache class:
 
@@ -21,14 +11,17 @@ Could you do get and put in O(1) time complexity?
  
 
 Example 1:
-
+```
 Input
 ["LRUCache", "put", "put", "get", "put", "get", "put", "get", "get", "get"]
 [[2], [1, 1], [2, 2], [1], [3, 3], [2], [4, 4], [1], [3], [4]]
+
 Output
 [null, null, null, 1, null, -1, null, -1, 3, 4]
+```
 
 Explanation
+```
 LRUCache lRUCache = new LRUCache(2);
 lRUCache.put(1, 1); // cache is {1=1}
 lRUCache.put(2, 2); // cache is {1=1, 2=2}
@@ -39,14 +32,16 @@ lRUCache.put(4, 4); // LRU key was 1, evicts key 1, cache is {4=4, 3=3}
 lRUCache.get(1);    // return -1 (not found)
 lRUCache.get(3);    // return 3
 lRUCache.get(4);    // return 4
+```
  
 
 Constraints:
-
+```
 1 <= capacity <= 3000
 0 <= key <= 3000
 0 <= value <= 104
 At most 3 * 104 calls will be made to get and put.
+```
 
 ```js
 class LRUCache {
