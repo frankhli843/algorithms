@@ -129,3 +129,60 @@ function test(desc, expected, actual){
 test('simple test case 1', '1->2->3->4->5->6', stringLinked(mergeKLists(testCase)))
 ```
 
+# Henrik
+```js
+/**
+ * Definition for singly-linked list.
+ * function ListNode(val, next) {
+ *     this.val = (val===undefined ? 0 : val)
+ *     this.next = (next===undefined ? null : next)
+ * }
+ */
+/**
+ * @param {ListNode[]} lists
+ * @return {ListNode}
+ */
+function mergeKLists(lists) {
+  let output = [], nodes = [...lists], current, smallest, smallestIndex = 0;
+  let i = 0;
+  while(true) {
+    smallest = undefined;
+    for(let j = 0, l = nodes.length; j < l; j++) {
+      current = nodes[j]?.val;
+      if(current) {
+        if(!smallest) 
+          smallest = current;
+        if(current <= smallest) {
+          smallest = current 
+          smallestIndex = j;        
+        }  
+      }
+    }     
+    if(!nodes[smallestIndex]) break;
+    output.push(nodes[smallestIndex].val);
+    if(!!nodes[smallestIndex]) 
+      nodes[smallestIndex] = nodes[smallestIndex].next;
+    i++;
+    console.log(nodes);
+  }
+  return output;
+};
+
+function ListNode(val, next) {
+  this.val = (val===undefined ? 0 : val)
+  this.next = (next===undefined ? null : next)
+ }
+ // node[[2], [3]]
+let one1 = new ListNode(3);
+let two1 = new ListNode(2, one1);
+let node1 = new ListNode(1, two1);
+
+let a2 = new ListNode(4);
+let one2 = new ListNode(3, a2);
+let two2 = new ListNode(2, one2);
+let node2 = new ListNode(1, two2);
+
+const input = [node1, node2];
+
+console.log(mergeKLists(input));
+```
