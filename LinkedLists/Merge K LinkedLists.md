@@ -74,7 +74,7 @@ function mergeKLists(lists) {
     // CASE 2: There are 2 or more after it i.e. a->b->...->z->null
     else {
         // we want to sort the current list when the rest are sorted
-        return mergeLists(lists[0], lists.slice(1,lists.length));
+        return mergeLists(lists[0], mergeKLists(lists.slice(1,lists.length)));
     }
 };
 
