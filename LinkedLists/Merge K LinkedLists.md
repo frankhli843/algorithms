@@ -1,3 +1,4 @@
+# Prompt
 ```js
 You are given an array of k linked-lists lists, each linked-list is sorted in ascending order.
 Merge all the linked-lists into one sorted linked-list and return it.
@@ -33,7 +34,7 @@ k == lists.length
 lists[i] is sorted in ascending order.
 The sum of lists[i].length won't exceed 10^4.
 ```
-
+# My Solution
 ```js
 /**
  * Definition for singly-linked list.
