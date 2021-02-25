@@ -1,3 +1,4 @@
+# Prompt
 ```js
 You are given an array of k linked-lists lists, each linked-list is sorted in ascending order.
 Merge all the linked-lists into one sorted linked-list and return it.
@@ -33,7 +34,7 @@ k == lists.length
 lists[i] is sorted in ascending order.
 The sum of lists[i].length won't exceed 10^4.
 ```
-
+# Frank Solution
 ```js
 /**
  * Definition for singly-linked list.
@@ -73,7 +74,7 @@ function mergeKLists(lists) {
     // CASE 2: There are 2 or more after it i.e. a->b->...->z->null
     else {
         // we want to sort the current list when the rest are sorted
-        return mergeLists(lists[0], lists.slice(1,lists.length));
+        return mergeLists(lists[0], mergeKLists(lists.slice(1,lists.length)));
     }
 };
 
@@ -128,3 +129,57 @@ function test(desc, expected, actual){
 test('simple test case 1', '1->2->3->4->5->6', stringLinked(mergeKLists(testCase)))
 ```
 
+# Henrik Solution
+```js
+/**
+ * Definition for singly-linked list.
+ * function ListNode(val, next) {
+ *     this.val = (val===undefined ? 0 : val)
+ *     this.next = (next===undefined ? null : next)
+ * }
+ */
+/**
+ * @param {ListNode[]} lists
+ * @return {ListNode}
+ */
+function mergeKLists(lists) {
+  // define our variables
+  let output = [], nodes = [...lists], current, smallestIndex = 0;
+  while(true) {
+    smallestIndex = 0; // default smallestIndex to 0
+    for(let i = 0, l = nodes.length; i < l; i++) { // iterate over nodes
+      current = nodes[i]?.val; // set current node
+      if(current) { // only work with it if it exists
+        if(!nodes[smallestIndex]) smallestIndex = i; // if the smallest index is pointing to a null set the current to it
+        else if(current <= nodes[smallestIndex]?.val) { // if the current value is smaller than the smallestIndex value set the index to i
+          smallestIndex = i;        
+        }  
+      }
+    }     
+    if(!nodes[smallestIndex]) break; // if all of our nodes are pointing to null return
+    
+    output.push(nodes[smallestIndex].val); // push the value
+    nodes[smallestIndex] = nodes[smallestIndex].next; // set the current smallest to its child and rinse and repeat
+  }
+  return output;
+};
+
+function ListNode(val, next) {
+  this.val = (val===undefined ? 0 : val)
+  this.next = (next===undefined ? null : next)
+ }
+ // node[[2], [3]]
+let one1 = new ListNode(3);
+let two1 = new ListNode(2, one1);
+let node1 = new ListNode(1, two1);
+
+let a2 = new ListNode(4);
+let one2 = new ListNode(3, a2);
+let two2 = new ListNode(2, one2);
+let node2 = new ListNode(1, two2);
+
+const input = [node1, node2];
+
+console.log(mergeKLists(input));
+
+```
