@@ -63,14 +63,16 @@ function peakElement(list, pivotIndex = -1){
   }
   // case 2: check if left is element  [a, b, c]
   const left = peakElement(
-    list.slice(0, middleIndex+1)
+    list.slice(0, middleIndex+1),
+    pivotIndex
   ); 
   if (left !== -1){
     return left;
   }
   // case 3: check if right is element [c, d, e] 
   const right = peakElement(
-    list.slice(pivotIndex, list.length)
+    list.slice(pivotIndex, list.length),
+    pivotIndex
   )
   if (right !== -1){
     return right;
