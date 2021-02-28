@@ -47,7 +47,7 @@ Constraints:
 1 <= k <= nums.length
 ```
 
-# My Attempt
+# Frank's attempt
 - Time complexity: O(n) since we only visit each element once
 - Space complexity: O(n)
 ```js
@@ -159,4 +159,25 @@ test(
   maxSliding([4,-2], 2),
   [4]
 )
+```
+# Henrik's Attempt
+```js
+function maxSliding(nums, k) {
+  let max = 0;
+  let temp = 0;
+  let stack = [];
+  nums.forEach(number => {
+    temp += number;
+    stack.push(number)
+    if(stack.length === k) {
+      if(temp > max) max = temp;
+      temp -= stack.shift();
+    } else {
+      if(temp > max) max = temp;
+    }
+  })
+  return max;
+}
+
+document.write(maxSliding([1,2,3,4,5,6], 3))
 ```
