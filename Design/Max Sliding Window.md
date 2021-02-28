@@ -48,6 +48,8 @@ Constraints:
 ```
 
 # My Attempt
+- Time complexity: O(n) since we only visit each element once
+- Space complexity: O(n)
 ```js
 
 
