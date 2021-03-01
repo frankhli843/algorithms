@@ -32,3 +32,42 @@ beginWord != endWord
 All the strings in wordList are unique.
 ```
 
+# Tests
+```
+/**
+ * @param {string} beginWord
+ * @param {string} endWord
+ * @param {string[]} wordList
+ * @return {number}
+ */
+function ladderLength(beginWord, endWord, wordList) {
+    
+};
+
+function S(input){
+  return JSON.stringify(input);
+}
+
+function test(desc, expected, actual){
+  const e = S(expected);
+  const a = S(actual);
+  console.log(
+    a === e 
+      ? `\nTest '${desc}' passed!`
+      : `\nTest '${desc}' failed\n  expected:${e}\n  expected:${a}`
+  )
+}
+
+test("Testing the test", true, true)
+test(
+  'beginWord = "hit", endWord = "cog", wordList = ["hot","dot","dog","lot","log","cog"]',
+  5,
+  ladderLength("hit", "cog", ["hot","dot","dog","lot","log","cog"])
+)
+test(
+  'Input: beginWord = "hit", endWord = "cog", wordList = ["hot","dot","dog","lot","log"]',
+  0,
+  ladderLength("hit", "cog", ["hot","dot","dog","lot","log"])
+)
+```
+
