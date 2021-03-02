@@ -116,6 +116,8 @@ class WordGraph {
   Let n be the number of nodes
   Let e be the number of edges
   then this runs in O(elog(n))
+
+  https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm#Pseudocode
    */
   shortestWordsToLink(beginWord, endWord){
     // Step 1: Mark all nodes unvisited. Create a set of all the unvisited nodes called the unvisited set.
