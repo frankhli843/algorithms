@@ -137,7 +137,7 @@ class Node {
     // "dog" and "cog" are matches and they will both have *cog in their matches map
     // for example "dog" has matches "*og", "d*g", and "do*"
     word.split("").forEach((c, i) => {
-      // for each letter append a the word with that letter replaced by *
+      // for each letter append the word with that letter replaced by *
       const splitWord = word.split("");
       splitWord[i] = "*";
       this.matches[splitWord.join("")] = true;
