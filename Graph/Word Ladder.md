@@ -50,7 +50,6 @@ function ladderLength(beginWord, endWord, wordList) {
 };
 
 class WordGraph {
-  value;
   nodes;
   edges;
   constructor(){
