@@ -13,4 +13,5 @@ marp: false
 
 
 # Lessons Learned
-- Don't name things in a new and unique way. Nodes have value attribute don't call it a word in a particular use case. It is easy to forget
+- Don't name things in a new and unique way. 
+    - For example I was making a graph node class that was handling words. I gave node the attribute word instead of value. Halfway through I forgot and kept using value which caused so much grief.
