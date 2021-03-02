@@ -10,3 +10,7 @@ marp: false
 
 
 ![img](img/sharpen.jpg)
+
+
+# Lessons Learned
+- Don't name things in a new and unique way. Nodes have value attribute don't call it a word in a particular use case. It is easy to forget
