@@ -78,6 +78,9 @@ class WordGraph {
     }
   }
 
+  /**
+  * This takes two nodes and adds an edge between them i.e. { "dog-cog": true }
+  */
   _addEdges(newNode, currentNode){
     
     const newNodeMatchesKeys = Object.keys(newNode.matches);
@@ -94,6 +97,7 @@ class WordGraph {
   }
 
   /**
+    *  This checks when given two words whether an edge exists for them
    * This runs in O(1) time since the edges are stored in a hashmap
    */
   hasEdge(word1, word2){
@@ -107,10 +111,13 @@ class WordGraph {
     return false;
   }
 
-  // use Dijkstra's Shortest Path First algorithm
-  // Let n be the number of nodes
-  // Let e be the number of edges
-  // then this runs in O(elog(n))
+ 
+  /**
+  use Dijkstra's Shortest Path First algorithm
+  Let n be the number of nodes
+  Let e be the number of edges
+  then this runs in O(elog(n))
+   */
   shortestWordsToLink(beginWord, endWord){
     // TODO implmenet this
     return 0;
@@ -126,15 +133,19 @@ class Node {
   constructor(word){
     this.word = word;
     this.matches = {};
-    // we want a list of possible matches here
+    // we want a list of possible matches here so that we can compare later on.
+    // "dog" and "cog" are matches and they will both have *cog in their matches map
     // for example "dog" has matches "*og", "d*g", and "do*"
     word.split("").forEach((c, i) => {
+      // for each letter append a the word with that letter replaced by *
       const splitWord = word.split("");
       splitWord[i] = "*";
       this.matches[splitWord.join("")] = true;
     })
   }
 }
+
+// ==================================== TESTING CODE ==================================================
 
 function S(input){
   return JSON.stringify(input);
