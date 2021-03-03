@@ -35,6 +35,7 @@ All the strings in wordList are unique.
 # Code
 ```js
 /**
+ * https://github.com/frankhli843/algorithms/blob/master/Graph/Word%20Ladder.md
  * @param {string} beginWord
  * @param {string} endWord
  * @param {string[]} wordList
@@ -44,114 +45,174 @@ All the strings in wordList are unique.
  * "dog" -> "cog" -> "cob"
  */
 function ladderLength(beginWord, endWord, wordList) {
-    const graph = new WordGraph();
-    wordList.forEach(word => { graph.addWord(word); })
-    return graph.shortestWordsToLink(beginWord, endWord);
+  // TODO think of a way to overcome cycles
+  const graph = new WordGraph();
+  // add words in wordlist to graph
+  wordList.forEach(word => {
+    graph.add(word);
+  })
+  return graph.shortestWordsToLink(beginWord, endWord);
 };
 
-class WordGraph {
-  nodes;
-  edges;
-  constructor(){
-    this.nodes = {};
-    this.edges = {};
-  }
-
-  /**
-   * Let n be the number of nodes then this runs in O(n) since it needs to check
-   * every node for a possible match
-   */
-  addWord(word){
-    // If no node yet then we will add it
-    if (!this.nodes[word]){
-      const newNode = new Node(word);
-    
-      // cycle through each existing node and add edges if there is a match
-      const nodeList = Object.keys(this.nodes);
-      for (let i = 0; i < nodeList.length; i += 1){
-        this._addEdges(newNode, this.nodes[nodeList[i]]);
-      }
-
-      this.nodes[word] = new Node(word);
-  
-    }
-  }
-
-  /**
-  * This takes two nodes and adds an edge between them i.e. { "dog-cog": true }
-  */
-  _addEdges(newNode, currentNode){
-    
-    const newNodeMatchesKeys = Object.keys(newNode.matches);
-    // we take the list of matchables from our new node match them to the currentNode
-    for (let i = 0; i < newNodeMatchesKeys.length-1; i += 1){
-      const currMatch = newNodeMatchesKeys[i];
-      if (currentNode.matches[currMatch]){ // if there is a match then we add 
-        // i.e. "dog" and "cog" matches then edges will have { "dog-cog"}
-        // the order won't matter because we will have a helper that checks both
-        this.edges[`${newNode.word}-${currentNode.word}`] = true;
-        return;
-      }
-    }
-  }
-
-  /**
-    *  This checks when given two words whether an edge exists for them
-   * This runs in O(1) time since the edges are stored in a hashmap
-   */
-  hasEdge(word1, word2){
-    const a = this.nodes[word1];
-    const b = this.nodes[word2];
-    if (!a || !b){
-      return false;
-    }
-    if (this.edges[`${a.word}-${b.word}`] || this.edges[`${b.word}-${a.word}`])
-      return true;
-    return false;
-  }
-
- 
-  /**
-  use Dijkstra's Shortest Path First algorithm
-  Let n be the number of nodes
-  Let e be the number of edges
-  then this runs in O(elog(n))
-
-  https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm#Pseudocode
-   */
-  shortestWordsToLink(beginWord, endWord){
-    // Step 1: Mark all nodes unvisited. Create a set of all the unvisited nodes called the unvisited set.
-    // Step 2: Assign to every node a tentative distance value: set it to zero for our initial node and to infinity for all other nodes. Set the initial node as current.[16]
-    // Step 3: For the current node, consider all of its unvisited neighbors and calculate their tentative distances through the current node. Compare the newly calculated tentative distance to the current assigned value and assign the smaller one. For example, if the current node A is marked with a distance of 6, and the edge connecting it with a neighbor B has length 2, then the distance to B through A will be 6 + 2 = 8. If B was previously marked with a distance greater than 8 then change it to 8. Otherwise, the current value will be kept.
-    // Step 4: When we are done considering all of the unvisited neighbors of the current node, mark the current node as visited and remove it from the unvisited set. A visited node will never be checked again.
-    // Step 5: If the destination node has been marked visited (when planning a route between two specific nodes) or if the smallest tentative distance among the nodes in the unvisited set is infinity (when planning a complete traversal; occurs when there is no connection between the initial node and remaining unvisited nodes), then stop. The algorithm has finished.
-    // Step 6: Otherwise, select the unvisited node that is marked with the smallest tentative distance, set it as the new "current node", and go back to step 3.
-    return 0;
-  }
-}
 
 class Node {
-  word;
-  matches;
+  value; 
+  matches; // array of matches
   /**
    * Let n be the number of characters in the word then this would run in O(n)
    */
-  constructor(word){
-    this.word = word;
-    this.matches = {};
+  constructor(value){
+    this.value = value;
+    this.matches = [];
     // we want a list of possible matches here so that we can compare later on.
     // "dog" and "cog" are matches and they will both have *cog in their matches map
     // for example "dog" has matches "*og", "d*g", and "do*"
-    word.split("").forEach((c, i) => {
+    // for each letter in the word
+    value.split("").forEach((l, i) => {
       // for each letter append the word with that letter replaced by *
-      const splitWord = word.split("");
-      splitWord[i] = "*";
-      this.matches[splitWord.join("")] = true;
+      const wordList = value.split("");
+      wordList[i] = "*";
+      this.matches.push(wordList.join(""));
     })
   }
 }
 
-// ==================================== TESTING CODE ==================================================
+class WordGraph {
+  nodes;  // Node[]
+  edges;  // [Node, Node]
+  constructor(){
+    this.nodes = [];
+    this.edges = [];
+  }
+
+  // returns the node
+  add(word){
+    if (!this.wordExists(word)){
+      const node = new Node(word);
+      // cycle through each existing node and add edges if there is a match
+      this.nodes.forEach(currNode => { this._addEdges(node, currNode); });
+      this.nodes.push(node); // add new node to the family :D
+      return node;
+    }
+    return this.getNode(word);
+  }
+
+  wordExists(word){
+    for (let i = 0; i < this.nodes.length; i++){
+      if (this.nodes[i].value === word){
+        return true;
+      }
+    }
+    return false;
+  }
+
+
+  _addEdges(newNode, currentNode){
+    // we take the list of matchables from our new node match them to the currentNode
+    newNode.matches.forEach(nMatch => {
+      currentNode.matches.forEach(cMatch => {  // if there is a match then we add 
+        if (nMatch === cMatch) 
+          this.edges.push([newNode, currentNode])
+      })
+    })
+  }
+  
+
+
+  hasEdge(word1, word2){
+    for (let i = 0; i < this.edges.length; i++){
+      const a = this.edges[i][0];
+      const b = this.edges[i][1];
+      if ((a.value === word1 && b.value === word2) 
+      || (b.value === word1 && a.value === word2)){
+        return true;
+      }
+    }
+    return false;
+  }
+
+  getNode(word){
+     for (let i = 0; i < this.nodes.length; i++){
+      if (this.nodes[i].value === word){
+        return this.nodes[i];
+      }
+    }
+    throw "could not find find node for " + word;
+  }
+
+  getNodeIndex(word){
+    for (let i = 0; i < this.nodes.length; i++){
+      if (this.nodes[i].value === word){
+        return i;
+      }
+    }
+   return -1;
+  }
+
+  // function will return a list of all nodes connected to the node with the given word
+  nodeChildren(word){
+    // a match on either side is fine since edges are not directional
+    return this.edges.map(e => {
+      if (e[0].value === word){ return e[1]}
+      else if (e[1].value === word){ return e[0]}
+    }).filter(node => node);
+  }
+
+  shortestWordsToLink(beginWord, endWord){
+    // if beginWord and endWord are the same then return 0
+    if (beginWord === endWord){
+      return 0;
+    }
+
+    // add begin word
+    const beginNode = this.add(beginWord);
+    // a queue where first in and first out order
+    const q = []; 
+    // nothing have been visited yet
+    const visited = this.nodes.map(n => false);
+    // set distance to all be infinity
+    const distance = this.nodes.map(n => {
+      if (n.value === beginWord) return 0;  // distance 0 to itself
+      else return Infinity; // we don't know the distance yet
+    })
+    // beginWord is new so first add it
+    q.push(beginNode)
+    while(q.length !== 0){ // while q is not empty)
+      const currentNode = q.shift(); // pop first element in array
+      const nodeIndex = this.getNodeIndex(currentNode.value);
+      if (!visited[nodeIndex]){ // only want to look at unvisited
+        visited[nodeIndex] = true; // we have now visited it
+        // get all nodes connected to this node to add in what to visit next
+        const nodeChildren = this.nodeChildren(currentNode.value);
+        // for all connected edges we want to check if we have reached out goal
+        for (let i = 0; i < nodeChildren.length; i++){
+          const childNode = nodeChildren[i]; 
+          const childIndex = this.getNodeIndex(childNode.value);
+          // we increase the distance by 1 in relation to our current node for children
+          // consider for example when we are at our first node the distance is 0
+          // for its children then we would want the distance to be 1 and their children 2 etc
+          distance[childIndex] = distance[nodeIndex] + 1;
+          // if currentNode word matches then we have our match 
+          if (childNode.value === endWord){
+            // since what we want is number of words not number of edges we add 1 to include the first word
+            return distance[childIndex] + 1; 
+          }
+          // otherwise add this node to the queue
+          else {
+            q.push(childNode); // adds it to the end of the queue
+          }
+            
+        }
+      }
+    }
+     // no link is found return 0;
+      return 0;
+  }
+  
+}
+
+
+// =============== TESTING CODE =============
 
 function S(input){
   return JSON.stringify(input);
@@ -174,13 +235,12 @@ function runTestCases(){
   test(
     "Testing Node('dog') for the matches list: ['*og', 'd*g', 'do*']", 
     ['*og', 'd*g', 'do*'], 
-    Object.keys(n.matches)
+    n.matches
   );
 
   let w = new WordGraph();
-  w.addWord("cog");
-  w.addWord("dog");
-  console.log(w.edges)
+  w.add("cog");
+  w.add("dog");
   test(
     "WordGraph add for cog and dog results in an edge to each other",
     true,
@@ -200,7 +260,5 @@ function runTestCases(){
   )
 }
 runTestCases()
-
-
 ```
 
