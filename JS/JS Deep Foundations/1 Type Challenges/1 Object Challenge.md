@@ -1,4 +1,4 @@
-# Object.is 
+# Level 1: Object.is 
 ```js
 // The Object.is() method determines whether two values are the same value.
 // TODO: define polyfill for `Object.is(..)`
@@ -94,3 +94,70 @@ test('Object.is(undefined, null) === false', Object.is(undefined, null) === fals
 ```
 
 </details>
+
+# Level 2: implement `==`
+- implement your own version of == to gain an understanding of JS types. Do not use `==`, `===`, `Object.is`
+```js
+// The Object.is() method determines whether two values are the same value.
+// TODO: define polyfill for `Object.is(..)`
+
+// implement the equivalent of js ==
+function eq(x, y){
+  return "not implemented";
+}
+
+// tests:
+function S(input){
+  return JSON.stringify(input);
+}
+function test(desc, expected, actual,){
+  if (expected === actual){
+    console.log(`Test passed for: '${desc}''`)
+  }
+  else {
+    console.log(`Test failed for: '${desc}'\n  expected:${expected}\n  actual:${actual}`)
+  }
+}
+
+class Class {}
+
+const testTypes = [
+  BigInt(9007199254740991),
+  BigInt(2),
+  -BigInt(2),
+  -2,
+  -2.0,
+  2.0,
+  2, 
+  "2", 
+  "word", 
+  NaN, 
+  Infinity, 
+  -Infinity, 
+  "two", 
+  undefined, 
+  null, 
+  ()=>{}, 
+  function(){},
+  {},
+  true,
+  false,
+  "true",
+  "false",
+  1,
+  2,
+  new Class(),
+  Symbol("Symbol"),
+  0,
+  -0,
+  Date.now()
+]
+
+testTypes.forEach(x => {
+  testTypes.forEach(y => {
+    test(`${S(x)} == ${S(y)}`, x == y, eq(x,y))
+  })
+})
+
+
+```
