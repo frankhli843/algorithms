@@ -2,10 +2,11 @@
 // The Object.is() method determines whether two values are the same value.
 // TODO: define polyfill for `Object.is(..)`
 
-if (!Object.is || true) {
-  Object.is = function ObjectIs(x, y) {
 
-  };
+Object.is = function ObjectIs(x, y) {
+
+};
+
   // tests:
 console.log(Object.is(42, 42) === true);
 console.log(Object.is("foo", "foo") === true);
