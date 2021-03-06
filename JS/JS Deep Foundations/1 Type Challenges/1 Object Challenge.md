@@ -101,30 +101,142 @@ test('Object.is(undefined, null) === false', Object.is(undefined, null) === fals
 // The Object.is() method determines whether two values are the same value.
 // TODO: define polyfill for `Object.is(..)`
 
-// implement the equivalent of js ==
+/**
+ * 7.2.14Abstract Equality Comparison
+The comparison x == y, where x and y are values, produces true or false. Such a comparison is performed as follows:
+
+If Type(x) is the same as Type(y), then
+Return the result of performing Strict Equality Comparison x === y.
+If x is null and y is undefined, return true.
+If x is undefined and y is null, return true.
+If Type(x) is Number and Type(y) is String, return the result of the comparison x == ! ToNumber(y).
+If Type(x) is String and Type(y) is Number, return the result of the comparison ! ToNumber(x) == y.
+If Type(x) is Boolean, return the result of the comparison ! ToNumber(x) == y.
+If Type(y) is Boolean, return the result of the comparison x == ! ToNumber(y).
+If Type(x) is either String, Number, or Symbol and Type(y) is Object, return the result of the comparison x == ToPrimitive(y).
+If Type(x) is Object and Type(y) is either String, Number, or Symbol, return the result of the comparison ToPrimitive(x) == y.
+Return false.
+
+ */
 function eq(x, y){
-  return "not implemented";
+
+  return strictEq(x,y)
 }
+
+/**
+ 7.2.15 Strict Equality Comparison
+The comparison x === y, where x and y are values, produces true or false. Such a comparison is performed as follows:
+
+If Type(x) is different from Type(y), return false.
+If Type(x) is Number, then
+  If x is NaN, return false.
+  If y is NaN, return false.
+  If x is the same Number value as y, return true.
+  If 
+  If x is -0 and y is +0, return true.
+  Return false.
+Return SameValueNonNumber(x, y).
+ */
+function strictEq(x,y){
+  // CASE 1: different types
+  if (typeof x !== typeof y){
+    return false;
+  }
+  // CASE 2: number
+  else if (typeof x === 'number'){
+    // isNaN case
+    if (isNaN(x || isNaN(y))){
+      return false
+    }
+    // same number
+    else if (x === y){
+      return true;
+    }
+    // x is +0 and y is -0, return true.
+    else if (x === 0 && isNegativeZero(y)){
+      return true;
+    }
+    else if (y === 0 && isNegativeZero(x)){
+      return true;
+    }
+    return false;
+  }
+  // CASE 3: Same type not number
+  return sameValueNonNumber(x,y);
+
+}
+
+// NaN is the only type that does not equal itself
+function isNaN(x){ 
+  return x !== x;
+}
+
+function isNegativeZero(x){
+  return x === 0 && 1/0 === -Infinity;
+}
+
+/**
+ * 7.2.12
+ * SameValueNonNumber ( x, y )
+The internal comparison abstract operation SameValueNonNumber(x, y), where neither x nor y are Number values, produces true or false. Such a comparison is performed as follows:
+
+Assert: Type(x) is not Number.
+Assert: Type(x) is the same as Type(y).
+If Type(x) is Undefined, return true.
+If Type(x) is Null, return true.
+If Type(x) is String, then
+If x and y are exactly the same sequence of code units (same length and same code units at corresponding indices), return true; otherwise, return false.
+If Type(x) is Boolean, then
+If x and y are both true or both false, return true; otherwise, return false.
+If Type(x) is Symbol, then
+If x and y are both the same Symbol value, return true; otherwise, return false.
+If x and y are the same Object value, return true. Otherwise, return false.
+ */
+function sameValueNonNumber(x,y){
+  // CASE 1: Null or Undefined
+  if (typeof x === "null" || typeof x === 'undefined'){
+    return true;
+  }
+  // CASE 2: String
+  else if (typeof x === "string"){
+    if (x.length !== y.length)
+      return false;
+    const xList = x.split("");
+    const yList = y.split("");
+    for (let i = 0; i < xList.length; i+=1){
+      if (xList[i] !== yList[i])
+        return false;
+    }
+    return true;
+  }
+  // CASE 3: bool
+  else if (typeof x === 'boolean'){
+    return sameValueNonNumber(x.toString(), y.toString());
+  }
+  else if (typeof x === 'symbol'){
+    return x === y; // same value check
+  }
+  else if (typeof x === 'object'){
+    return x === y; // same value check
+  }
+}
+
+
 
 // tests:
 function S(input){
   return JSON.stringify(input);
 }
 function test(desc, expected, actual,){
-  if (expected === actual){
-    console.log(`Test passed for: '${desc}''`)
-  }
-  else {
-    console.log(`Test failed for: '${desc}'\n  expected:${expected}\n  actual:${actual}`)
+  if (expected !== actual){
+    console.log(`Test failed for: '${desc}'\n  expected:${expected}\n  actual:${actual}`);
+  return '';
   }
 }
 
 class Class {}
 
 const testTypes = [
-  BigInt(9007199254740991),
-  BigInt(2),
-  -BigInt(2),
   -2,
   -2.0,
   2.0,
@@ -153,11 +265,13 @@ const testTypes = [
   Date.now()
 ]
 
+unique = {}
 testTypes.forEach(x => {
   testTypes.forEach(y => {
-    test(`${S(x)} == ${S(y)}`, x == y, eq(x,y))
+    test(`${S(x)} == ${S(y)}`, x == y, eq(x,y));
   })
 })
+
 
 
 ```
