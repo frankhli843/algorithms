@@ -45,10 +45,8 @@ All the strings in wordList are unique.
  * "dog" -> "cog" -> "cob"
  */
 function ladderLength(beginWord, endWord, wordList) {
-  // TODO think of a way to overcome cycles
   const graph = new WordGraph();
-  // add words in wordlist to graph
-  wordList.forEach(word => {
+  [...wordList, beginWord, endWord].forEach(word => {
     graph.add(word);
   })
   return graph.shortestWordsToLink(beginWord, endWord);
@@ -58,12 +56,16 @@ function ladderLength(beginWord, endWord, wordList) {
 class Node {
   value; 
   matches; // array of matches
+  distance; // number used to measure distances for graph traversals  
+  visited; // bool used in graph tranversals whether something is visited
   /**
    * Let n be the number of characters in the word then this would run in O(n)
    */
   constructor(value){
     this.value = value;
     this.matches = [];
+    this.distance = Infinity;
+    this.visited = false;
     // we want a list of possible matches here so that we can compare later on.
     // "dog" and "cog" are matches and they will both have *cog in their matches map
     // for example "dog" has matches "*og", "d*g", and "do*"
@@ -159,56 +161,47 @@ class WordGraph {
   }
 
   shortestWordsToLink(beginWord, endWord){
-    // if beginWord and endWord are the same then return 0
-    if (beginWord === endWord){
-      return 0;
-    }
+    console.log(`beginWord: ${beginWord}, endWord: ${endWord}`)
+      // if beginWord and endWord are the same then return 0
+      if (beginWord === endWord) return 0;
+      
+      // set all nodes to infinity distance 
+      this.nodes.forEach(n => {
+        n.distance = Infinity;
+        n.visited = false;
+      });
 
-    // add begin word
-    const beginNode = this.add(beginWord);
-    // a queue where first in and first out order
-    const q = []; 
-    // nothing have been visited yet
-    const visited = this.nodes.map(n => false);
-    // set distance to all be infinity
-    const distance = this.nodes.map(n => {
-      if (n.value === beginWord) return 0;  // distance 0 to itself
-      else return Infinity; // we don't know the distance yet
-    })
-    // beginWord is new so first add it
-    q.push(beginNode)
-    while(q.length !== 0){ // while q is not empty)
-      const currentNode = q.shift(); // pop first element in array
-      const nodeIndex = this.getNodeIndex(currentNode.value);
-      if (!visited[nodeIndex]){ // only want to look at unvisited
-        visited[nodeIndex] = true; // we have now visited it
-        // get all nodes connected to this node to add in what to visit next
-        const nodeChildren = this.nodeChildren(currentNode.value);
-        // for all connected edges we want to check if we have reached out goal
-        for (let i = 0; i < nodeChildren.length; i++){
-          const childNode = nodeChildren[i]; 
-          const childIndex = this.getNodeIndex(childNode.value);
-          // we increase the distance by 1 in relation to our current node for children
-          // consider for example when we are at our first node the distance is 0
-          // for its children then we would want the distance to be 1 and their children 2 etc
-          distance[childIndex] = distance[nodeIndex] + 1;
-          // if currentNode word matches then we have our match 
-          if (childNode.value === endWord){
-            // since what we want is number of words not number of edges we add 1 to include the first word
-            return distance[childIndex] + 1; 
+      const beginWordNode = this.getNode(beginWord);
+      beginWordNode.distance = 1; // starts at one since we are counting words
+
+      const q = [beginWordNode]; // start off with queue
+
+      while (q.length !== 0){
+        console.log(`  queue: [${q.map(a => a.value)}], starting at start of while loop again`)
+        const currentNode = q.shift();
+        console.log(`    currentNode:'${currentNode.value}'`)
+        if (!currentNode.visited){
+          console.log(`    node not yet visited so going to add its children`)
+          currentNode.visited = true;
+          const children = this.nodeChildren(currentNode.value);
+          console.log(`    children: [${children.map(c => c.value)}]`)
+          for (let i = 0; i < children.length; i++){
+            const child = children[i];
+            if (child.value === endWord){
+              console.log(`Match found! distance ${currentNode.distance + 1}`)
+              return currentNode.distance + 1;
+            }
+            else{
+              console.log(`    Add ${child.value} to queue`)
+              child.distance = currentNode.distance + 1;
+              q.push(child);
+            }
+              
           }
-          // otherwise add this node to the queue
-          else {
-            q.push(childNode); // adds it to the end of the queue
-          }
-            
         }
       }
+      return 0; // nothing is found return 0
     }
-     // no link is found return 0;
-      return 0;
-  }
-  
 }
 
 
@@ -261,4 +254,45 @@ function runTestCases(){
 }
 runTestCases()
 ```
-
+# Algorithm in action
+```
+Test 'beginWord = "hit", endWord = "cog", wordList = ["hot","dot","dog","lot","log","cog"]' passed!
+beginWord: hit, endWord: cog
+  queue: [hit], starting at start of while loop again
+    currentNode:'hit'
+    node not yet visited so going to add its children
+    children: [hot]
+    Add hot to queue
+  queue: [hot], starting at start of while loop again
+    currentNode:'hot'
+    node not yet visited so going to add its children
+    children: [dot,lot,hit]
+    Add dot to queue
+    Add lot to queue
+    Add hit to queue
+  queue: [dot,lot,hit], starting at start of while loop again
+    currentNode:'dot'
+    node not yet visited so going to add its children
+    children: [hot,dog,lot]
+    Add hot to queue
+    Add dog to queue
+    Add lot to queue
+  queue: [lot,hit,hot,dog,lot], starting at start of while loop again
+    currentNode:'lot'
+    node not yet visited so going to add its children
+    children: [hot,dot,log]
+    Add hot to queue
+    Add dot to queue
+    Add log to queue
+  queue: [hit,hot,dog,lot,hot,dot,log], starting at start of while loop again
+    currentNode:'hit'
+  queue: [hot,dog,lot,hot,dot,log], starting at start of while loop again
+    currentNode:'hot'
+  queue: [dog,lot,hot,dot,log], starting at start of while loop again
+    currentNode:'dog'
+    node not yet visited so going to add its children
+    children: [dot,log,cog]
+    Add dot to queue
+    Add log to queue
+Match found! distance 5
+```
