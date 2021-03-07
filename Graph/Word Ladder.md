@@ -61,7 +61,7 @@ function ladderLength(beginWord, endWord, wordList) {
     nodes[w] = {
       word: w, visited: false, distance: Infinity, 
       matchList: w.split("").map((x,i) => { 
-        // i.e. ['do*', d*g', 'do*']
+        // i.e. ['*og', d*g', 'do*']
         const l = w.split("");
         l[i] = "*";
         return l.join("");
