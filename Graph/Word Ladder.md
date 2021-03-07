@@ -113,7 +113,6 @@ function ladderLength(beginWord, endWord, wordList) {
 <details><summary>Object Oriented Approach</summary>
  
 ```js
-```js
 /**
  * https://github.com/frankhli843/algorithms/blob/master/Graph/Word%20Ladder.md
  * @param {string} beginWord
@@ -286,7 +285,8 @@ class WordGraph {
 
 </details>
 
-# Test Code
+<details><summary>Test Code</summary>
+ 
 ```js
 function S(input){
   return JSON.stringify(input);
@@ -323,3 +323,5 @@ function runTestCases(){
 }
 runTestCases()
 ```
+
+</details>
