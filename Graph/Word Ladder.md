@@ -158,16 +158,6 @@ class Node {
     })
   }
 }
-<table>
-<tr>
-<th>
-Object Oriented 
-</th>
-<th>
-Functional
-</th>
-</tr>
-
 class WordGraph {
   nodes;  // Node[]
   edges;  // [Node, Node]
@@ -296,48 +286,6 @@ class WordGraph {
 
 </details>
 
-# Algorithm in action
-```
-Test 'beginWord = "hit", endWord = "cog", wordList = ["hot","dot","dog","lot","log","cog"]' passed!
-beginWord: hit, endWord: cog
-  queue: [hit], starting at start of while loop again
-    currentNode:'hit'
-    node not yet visited so going to add its children
-    children: [hot]
-    Add hot to queue
-  queue: [hot], starting at start of while loop again
-    currentNode:'hot'
-    node not yet visited so going to add its children
-    children: [dot,lot,hit]
-    Add dot to queue
-    Add lot to queue
-    Add hit to queue
-  queue: [dot,lot,hit], starting at start of while loop again
-    currentNode:'dot'
-    node not yet visited so going to add its children
-    children: [hot,dog,lot]
-    Add hot to queue
-    Add dog to queue
-    Add lot to queue
-  queue: [lot,hit,hot,dog,lot], starting at start of while loop again
-    currentNode:'lot'
-    node not yet visited so going to add its children
-    children: [hot,dot,log]
-    Add hot to queue
-    Add dot to queue
-    Add log to queue
-  queue: [hit,hot,dog,lot,hot,dot,log], starting at start of while loop again
-    currentNode:'hit'
-  queue: [hot,dog,lot,hot,dot,log], starting at start of while loop again
-    currentNode:'hot'
-  queue: [dog,lot,hot,dot,log], starting at start of while loop again
-    currentNode:'dog'
-    node not yet visited so going to add its children
-    children: [dot,log,cog]
-    Add dot to queue
-    Add log to queue
-Match found! distance 5
-```
 # Test Code
 ```js
 function S(input){
