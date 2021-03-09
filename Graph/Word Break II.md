@@ -26,3 +26,48 @@ Constraints:
 1 <= wordDict[i].length <= 10
 s and wordDict[i] consist of only lowercase English letters.
 All the strings of wordDict are unique.
+
+# Code 
+```js
+/**
+ * take a string and then break them up so that the entire input is 
+ * composed of valid words for wordDict
+ */
+const wordBreak = function(s, wordDict) {
+ const resultList = [];
+ addValidWordBreaks(s, wordDict, resultList);
+ return resultList;
+};
+
+// mutates resultList, each call we deal with a smaller sublist until we 
+const addValidWordBreaks = (s, wordDict, resultList, builtSentenceList = []) => {
+  // BASE CASE: s is empty or all that remains is a word which means we are at the end so push to resultList
+  if (s === "" || s in wordDict){
+    resultList.push(builtSentenceList.join(" "))
+  }
+  // CASE 2: there is still words left in s so we want to keep iterating forward 
+  else {
+    for (word in wordDict){
+      if (s.startsWith(word)){
+        builtSentence.push(word);
+        addValidWordBreaks(s.slice(word.length), wordDict, builtSentence)
+      }
+    }
+  }
+  
+}
+
+const s = (i) => JSON.stringify(s);
+const t = (desc, exp, act) => {
+  console.log(s(exp) === s(act) 
+    ? `Test ${desc} passed!`
+    : `Test ${desc} failed! :(  \nexpected:${s(exp)}\n  actual:${s(act)}`
+    )
+}
+
+t('testing the test', true, true)
+t(
+  'Input: s = "catsanddog", wordDict = ["cat","cats","and","sand","dog"]',["cats and dog","cat sand dog"], 
+  wordBreak("catsanddog", ["cat","cats","and","sand","dog"])
+)
+```
