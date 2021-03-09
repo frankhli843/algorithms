@@ -32,6 +32,9 @@ All the strings of wordDict are unique.
 /**
  * take a string and then break them up so that the entire input is 
  * composed of valid words for wordDict
+ * 
+ * Let n length of s 
+ * Let p be the lenght of wordDict  
  */
 const wordBreak = function(s, wordDict) {
  const resultList = [];
@@ -47,14 +50,13 @@ const addValidWordBreaks = (s, wordDict, resultList, builtSentenceList = []) => 
   }
   // CASE 2: there is still words left in s so we want to keep iterating forward 
   else {
-    for (word in wordDict){
-      if (s.startsWith(word)){
-        builtSentence.push(word);
-        addValidWordBreaks(s.slice(word.length), wordDict, builtSentence)
-      }
+      wordDict.forEach(word => {
+        if (s.startsWith(word)){
+          builtSentenceList.push(word);
+          addValidWordBreaks(s.slice(word.length), wordDict, builtSentenceList)
+        }
+      })
     }
-  }
-  
 }
 
 const s = (i) => JSON.stringify(s);
@@ -68,6 +70,7 @@ const t = (desc, exp, act) => {
 t('testing the test', true, true)
 t(
   'Input: s = "catsanddog", wordDict = ["cat","cats","and","sand","dog"]',["cats and dog","cat sand dog"], 
-  wordBreak("catsanddog", ["cat","cats","and","sand","dog"])
+  wordBreak("catsanddog", ["cat","cats","and","sand","dog"]),
+  ["cats and dog","cat sand dog"]
 )
 ```
