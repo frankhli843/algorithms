@@ -26,3 +26,56 @@ Constraints:
 1 <= wordDict[i].length <= 10
 s and wordDict[i] consist of only lowercase English letters.
 All the strings of wordDict are unique.
+
+# Code 
+```js
+const debugMode = false;
+
+/**
+ * take a string and then break them up so that the entire input is 
+ * composed of valid words for wordDict
+ * 
+ * Let n length of s 
+ * Let p be the lenght of wordDict  
+ */
+const wordBreak = function(s, wordDict) {
+ return addValidWordBreaks(s, wordDict);
+};
+
+// mutates resultList, each call we deal with a smaller sublist until we 
+const addValidWordBreaks = (s, wordDict, resultList=[], builtSentenceList = []) => {
+  debugMode && console.log(`s: '${s}', resultList: [${resultList}], buildSentenceList: [${builtSentenceList}]`)
+  // BASE CASE: s is empty or all that remains is a word which means we are at the end so push to resultList
+  if (s === "" || s in wordDict){
+    resultList.unshift(builtSentenceList.join(" "))
+    builtSentenceList.length = 0;
+  }
+  // CASE 2: there is still words left in s so we want to keep iterating forward 
+  else {
+      wordDict.forEach(word => {
+        const nextBranches = [];
+        if (s.startsWith(word)){
+          builtSentenceList.push(word);
+          addValidWordBreaks(s.slice(word.length), wordDict, resultList, builtSentenceList)
+        }
+      })
+    }
+  return resultList;
+}
+
+const S = (i) => {return JSON.stringify(i) };
+const t = (desc, exp, act) => {
+  console.log(S(exp) === S(act) 
+    ? `Test passed!\n ${desc}`
+    : `Test failed! :( \n  ${desc}\n  expected:${S(exp)}\n  actual:${S(act)}`
+    )
+}
+
+t('testing the test', true, true)
+t(
+  'Input: s = "catsanddog", wordDict = ["cat","cats","and","sand","dog"]',["cats and dog","cat sand dog"], 
+  wordBreak("catsanddog", ["cat","cats","and","sand","dog"]),
+  ["cats and dog","cat sand dog"]
+)
+
+```
