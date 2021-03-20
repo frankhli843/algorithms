@@ -33,7 +33,7 @@ Explanation: The robot moves from (0, 0) -> (0, 1) -> (-1, 1) -> (-1, 0) -> (0, 
 1 <= instructions.length <= 100
 instructions[i] is 'G', 'L' or, 'R'.
 
-<details><summary>My JS solution</summary>
+<details><summary>Attempt 1</summary>
 
 ```js
 /**
