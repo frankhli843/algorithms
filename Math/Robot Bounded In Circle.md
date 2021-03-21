@@ -132,3 +132,67 @@ function isRobotBounded(instructions) {
 ```
 
 </details>
+
+
+<details><summary>Optimized Attempt</summary>
+
+```js
+/**
+ * @param {string} instructions
+ * @return {boolean}
+ 
+          
+   facing this way 
+          r 
+          
+[
+    -2 [-2, -1, 0,  1,  2],
+    -1 [-2, -1, 0,  1,  2],
+     0 [-2, -1, 0,  1,  2],
+     1 [-2, -1, 0,  1,  2],
+     2 [-2, -1, 0,  1,  2],
+]
+
+true turns: a turn where the robot moves foward at least once afterwards and was not negated by another turn or by 3 consective turns in the same direction
+no circle
+    has a foward movement
+        no turns
+        the turns negate one another
+        there is less than 3 true turns in a given direction
+
+ - if you turn left then right or right then left then you negate the direction
+ */
+function isRobotBounded(instructionString) {  
+    // for movement in a given direction the x, y that is offset from 0,0
+    const offSets = {
+        0: [0,1],  // north, 
+        1: [1,0],   // east
+        2: [0,-1], // south
+        3: [-1,0]   // west
+    }
+    // initial position in the center
+    let x = 0;
+    let y = 0;
+    let direction = 0; // initially facing north
+    // it is possible there are no movements 
+    let totalMovements = 0; 
+
+    instructionString.split("").forEach(char => {
+        if (char === 'L')
+            direction = (direction + 3) % 4;
+        else if (char === 'R')
+            direction = (direction + 1) % 4;
+        // its a movement so we want to calculate offset
+        else {
+            totalMovements += 1;
+            x += offSets[direction][0];
+            y += offSets[direction][1];
+        }
+    })
+    return (totalMovements === 0 // CASE 1: Robot does not move at all
+       || x === 0 && y === 0 // robot completes cycle in one sequence
+       || direction !== 0) // or changed its direction
+};
+```
+
+</details>
