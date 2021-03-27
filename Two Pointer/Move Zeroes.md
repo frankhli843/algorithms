@@ -242,14 +242,11 @@ nums is sorted in ascending order.
     /**
     * @param {number[]} nums
     * @return {number}
-    [1, 2, 3, 4, 2, 3, 4]
+    [...sorted, ...duplicates, ...new values]
             s
-                    f
-    
-    [1, 1, 3]
-    [3, 1, 1]
-    p and everything before p is no duplicated
-    everything between p and c is a duplicate 
+                                f
+    s and everything before s is no duplicated
+    everything between s and f is a duplicate 
     */
     var removeDuplicates = function(nums) {
         if (nums.length === 0) return 0;
@@ -264,6 +261,5 @@ nums is sorted in ascending order.
             }
         })
         nums.length = slow + 1;
-        
     };
 ```
