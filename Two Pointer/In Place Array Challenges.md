@@ -311,28 +311,33 @@ nums is sorted in ascending order.
 
 # Solution 
 ```js
+
 /**
  * @param {number[]} nums
  * @return {number}    
-  [1, 1, 1, 2, 2, 2, 3]
-         s
-            f
+  [1, 1, 2, 2, 3, 2, 2, 2, 3]
+                  s
+                           f
 
- count: 3
+ count: 2
+ anything before s is fine
+ s is a position that should be replaced
+ anything between s and f can be replaced
  
  */
 var removeDuplicates = function(nums) {
     let slow = 1;
-
-    nums.slice(1).forEach((n, fast) => {
-        if (nums[fast] === nums[fast -1]) count += 1;
-        else count = 1;
-        
-        if (count <= 2){
-            fast += 1;
-            nums[slow] = nums[fast]
-            slow += 1;
+    let count = 1;
+    nums.forEach((n, fast) => {
+        if (fast !== 0){
+            if (nums[fast] === nums[fast -1]) count += 1;
+            else count = 1;
+            if (count <= 2){
+                nums[slow] = nums[fast];
+                 slow += 1;
+            }
         }
+        
     })
     nums.length = slow;
 };
