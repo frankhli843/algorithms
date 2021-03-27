@@ -1,4 +1,7 @@
 # Move zeroes: do not maintain order
+
+<details> <summary>click to expand </summary>
+
 ```js
 Given an integer array nums, move all 0's to the end of it while maintaining the relative order of the non-zero elements and return the number of 0s
 
@@ -74,6 +77,8 @@ function moveZeroes(nums) {
 
 ```
 
+</details>
+<details> <summary>click to expand </summary>
 
 # Move zeroes: maintain order
 Given an integer array nums, move all 0's to the end of it while maintaining the relative order of the non-zero elements.
@@ -126,6 +131,9 @@ function moveZeroes(nums) {
 };
 
 ```
+
+</details>
+<details> <summary>click to expand </summary>
 
 # Remove element
 Given an array nums and a value val, remove all instances of that value in-place and return the new length.
@@ -196,6 +204,9 @@ Constraints:
     };
 ```
 
+</details>
+<details> <summary>click to expand </summary>
+
 # Remove Duplicates from Sorted Array
 Given a sorted array nums, remove the duplicates in-place such that each element appears only once and returns the new length.
 
@@ -263,3 +274,58 @@ nums is sorted in ascending order.
         nums.length = slow + 1;
     };
 ```
+
+</details>
+<details> <summary>click to expand </summary>
+
+# Remove Duplicates from Sorted Array II
+Given a sorted array nums, remove the duplicates in-place such that duplicates appeared at most twice and return the new length.
+
+Do not allocate extra space for another array; you must do this by modifying the input array in-place with O(1) extra memory.
+
+Example 1:
+Input: nums = [1,1,1,2,2,3]
+Output: 5, nums = [1,1,2,2,3]
+Explanation: Your function should return length = 5, with the first five elements of nums being 1, 1, 2, 2 and 3 respectively. It doesn't matter what you leave beyond the returned length.
+
+Example 2:
+Input: nums = [0,0,1,1,1,1,2,3,3]
+Output: 7, nums = [0,0,1,1,2,3,3]
+Explanation: Your function should return length = 7, with the first seven elements of nums being modified to 0, 0, 1, 1, 2, 3 and 3 respectively. It doesn't matter what values are set beyond the returned length.
+ 
+
+Constraints:
+1 <= nums.length <= 3 * 104
+-104 <= nums[i] <= 104
+nums is sorted in ascending order.
+
+# Solution 
+```js
+/**
+ * @param {number[]} nums
+ * @return {number}    
+  [1, 1, 1, 2, 2, 2, 3]
+         s
+            f
+
+ count: 3
+ 
+ */
+var removeDuplicates = function(nums) {
+    let slow = 1;
+
+    nums.slice(1).forEach((n, fast) => {
+        if (nums[fast] === nums[fast -1]) count += 1;
+        else count = 1;
+        
+        if (count <= 2){
+            fast += 1;
+            nums[slow] = nums[fast]
+            slow += 1;
+        }
+    })
+    nums.length = slow;
+};
+```
+
+</details>
