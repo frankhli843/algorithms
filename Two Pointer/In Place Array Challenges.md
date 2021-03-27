@@ -78,9 +78,12 @@ function moveZeroes(nums) {
 ```
 
 </details>
-<details> <summary>click to expand </summary>
+
 
 # Move zeroes: maintain order
+
+<details> <summary>click to expand </summary>
+
 Given an integer array nums, move all 0's to the end of it while maintaining the relative order of the non-zero elements.
 
 Note that you must do this in-place without making a copy of the array.
@@ -133,9 +136,11 @@ function moveZeroes(nums) {
 ```
 
 </details>
-<details> <summary>click to expand </summary>
 
 # Remove element
+
+<details> <summary>click to expand </summary>
+
 Given an array nums and a value val, remove all instances of that value in-place and return the new length.
 
 Do not allocate extra space for another array, you must do this by modifying the input array in-place with O(1) extra memory.
@@ -205,9 +210,12 @@ Constraints:
 ```
 
 </details>
-<details> <summary>click to expand </summary>
+
 
 # Remove Duplicates from Sorted Array
+
+<details> <summary>click to expand </summary>
+
 Given a sorted array nums, remove the duplicates in-place such that each element appears only once and returns the new length.
 
 Do not allocate extra space for another array, you must do this by modifying the input array in-place with O(1) extra memory.
@@ -275,10 +283,12 @@ nums is sorted in ascending order.
     };
 ```
 
-</details>
-<details> <summary>click to expand </summary>
+</details> 
 
 # Remove Duplicates from Sorted Array II
+
+<details> <summary>click to expand </summary>
+
 Given a sorted array nums, remove the duplicates in-place such that duplicates appeared at most twice and return the new length.
 
 Do not allocate extra space for another array; you must do this by modifying the input array in-place with O(1) extra memory.
