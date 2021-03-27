@@ -315,32 +315,37 @@ nums is sorted in ascending order.
 /**
  * @param {number[]} nums
  * @return {number}    
-  [1, 1, 2, 2, 3, 2, 2, 2, 3]
+  [1, 1, 2, 2, 3, 2, 2, 3]
                   s
-                           f
+                        f
 
- count: 2
+ count: 1
  anything before s is fine
  s is a position that should be replaced
  anything between s and f can be replaced
  
  */
 var removeDuplicates = function(nums) {
-    let slow = 1;
-    let count = 1;
-    nums.forEach((n, fast) => {
-        if (fast !== 0){
-            if (nums[fast] === nums[fast -1]) count += 1;
-            else count = 1;
-            if (count <= 2){
-                nums[slow] = nums[fast];
-                 slow += 1;
-            }
-        }
-        
-    })
+   let [count, slow] = [1, 1];
+   nums.forEach((n, fast) => {
+       if (fast > 0){
+           // adjust the count for duplicates
+           if (nums[fast] === nums[fast-1]) count += 1;
+           else count = 1;
+           
+           // if the count is less than 3 then we will copy over 
+           // values to slow and then increment foward
+           // this way we are only shifting values over when the count
+           // of what is currently being tracked is less than 2
+           if (count < 3){
+               nums[slow] = nums[fast];
+               slow += 1;
+           }
+       }
+   })
     nums.length = slow;
 };
+
 ```
 
 </details>
