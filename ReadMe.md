@@ -18,3 +18,5 @@ marp: false
 - Don't try to clever and use a hashmap early on when you it to be an array most of the time. It might make things faster but it'll slow you down so much when you forget whether it is an object or a key. Instead use a TODO and just label that it could be a hashmap.
 - JS
     - .map will return undefined for anything not returned use .filter(a) to removed that. Note though that this will remove 0
+- When in doubt start with brute force and then optimize by logically restricting.
+- If you are taking a pointers approach than set up the number of points required for a given calculation.
