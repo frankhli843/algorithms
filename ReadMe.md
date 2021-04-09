@@ -20,3 +20,48 @@ marp: false
     - .map will return undefined for anything not returned use .filter(a) to removed that. Note though that this will remove 0
 - When in doubt start with brute force and then optimize by logically restricting.
 - If you are taking a pointers approach than set up the number of points required for a given calculation.
+
+# JS Fiddle template
+```js
+<form>
+  <div id="main">
+  
+  </div>
+</form>
+
+$(document).ready(function () {
+
+    $('head').append('<meta name="theme-color" content="#fd9">');
+    
+
+});
+
+function s(x){ return JSON.stringify(x); }
+
+function test(desc, expected, actual){
+	$('#main').append(
+  	s(expected) === s(actual)
+    	? `Test ${desc} passed!`
+      : `Test ${desc} failed! expected: ${s(expected)}, actual: ${s(actual)}`
+  );
+}
+
+test("testing the test", true, false)
+
+html {
+  background: #643;
+  color: #222;
+}
+textarea {
+  border: 0px;
+  background: #000;
+  color: #fff;
+  padding: 10px;
+  outline: 0;
+}
+
+.main {
+  color: white;
+  background: black;
+}
+```
