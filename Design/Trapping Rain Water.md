@@ -22,11 +22,24 @@ n == height.length
 ```
 
 
-# Using Stack
-Using stacks
-Intuition
+# Two pointer solution
+```js
+function trap (height) {
+  let result = 0, leftMax= 0, rightMax = 0, l = 0, r = height.length - 1;
 
-Instead of storing the largest bar upto an index as in Approach 2, we can use stack to keep track of the bars that are bounded by longer bars and hence, may store water. Using the stack, we can do the calculations in only one iteration.
+  while (l < r){
+    if (height[l] < height[r]) {
+      if (height[l] >= leftMax) leftMax = height[l];
+      else result += leftMax - height[l];
+      l++;
+    } else {
+      if (height[r] >= rightMax) rightMax = height[r];
+      else result += rightMax - height[r];
+      r--;
+    }
+  }
+  
+  return result;
+};
 
-We keep a stack and iterate over the array. We add the index of the bar to the stack if bar is smaller than or equal to the bar at top of stack, which means that the current bar is bounded by the previous bar in the stack. If we found a bar longer than that at the top, we are sure that the bar at the top of the stack is bounded by the current bar and a previous bar in the stack, hence, we can pop it and add resulting trapped water to \text{ans}ans.
-
+```
