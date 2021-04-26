@@ -11,6 +11,15 @@ marp: false
 
 ![img](img/sharpen.jpg)
 
+# Table of Contents
+- These are sorted by the optimial solution used
+- [Design Solutions](https://github.com/frankhli843/algorithms/tree/master/Challenges/General%20Challenges/Design)
+- [Graph Solutions](https://github.com/frankhli843/algorithms/tree/master/Challenges/General%20Challenges/Graph)
+- [Math Solutions](https://github.com/frankhli843/algorithms/tree/master/Challenges/General%20Challenges/Math)
+- [Recusion](https://github.com/frankhli843/algorithms/tree/master/Challenges/General%20Challenges/Recusion)
+- [Sliding Window](https://github.com/frankhli843/algorithms/tree/master/Challenges/General%20Challenges/Sliding%20Window)
+- [Tree](https://github.com/frankhli843/algorithms/tree/master/Challenges/General%20Challenges/Tree)
+- [Two Pointer](https://github.com/frankhli843/algorithms/tree/master/Challenges/General%20Challenges/Two%20Pointer)
 
 # Lessons Learned
 - Don't name things in a new and unique way. 
