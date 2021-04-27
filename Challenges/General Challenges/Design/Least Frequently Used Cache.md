@@ -88,6 +88,30 @@ At most 105 calls will be made to get and put.
     
  */
 
+ /** 
+ 
+    The plan here is to keep a hashmap for each key and value to make sure get is O(1).
+    
+    For deciding which value to remove we keep a hashmap with count as key so that 
+    for a given interaction count there is an array for each node. Each array which holds
+    nodes with a given amount of iteration will act as a queue where we append later additions
+    and remove earlier ones since they will be older.
+    i.e. 
+    {
+        1: [{key: 'favorite food', value: 'chicken', count: 1}, {key: 'computer', value: 'macbook', count: 1}],   
+        2: [{key: 'favorite drink', value: 'water', count: 2}]
+    }
+    So our algorithm will get the lowest count array in this it is 1
+    [{key: 'favorite food', value: 'chicken', count: 1}, {key: 'computer', value: 'macbook', count: 1}]
+    then it will remove the first of the list since it would be the oldest
+    
+    @member countHash {[retrieveCount: number]: Node[] }
+    @member hash {[key: string]: Node } for quick retrival
+    Node will be { date: string, key: string, value: any, count: number }
+    
+    
+ */
+
 class LFUCache {
     capacity;
     hash; 
@@ -106,7 +130,7 @@ class LFUCache {
         if (!(key in this.hash)){ 
             // case 1.1: over capacity, remove the least used
             if (this.capacity === this.count){ // here we have a list of each count
-                const leastUsedCount = Object.keys(this.countHash).sort((a,b) => a - b)[0];
+                const leastUsedCount = parseInt(Object.keys(this.countHash).sort((a,b) => a - b)[0]);
                 let keyToDelete;
                 // if there is only 1 then we remove it 
                 if (this.countHash[leastUsedCount].length === 1){
@@ -114,7 +138,7 @@ class LFUCache {
                     this.countHash[leastUsedCount] = [];
                 }
                 else { // otherwise since the array is acting as a queue we we know we want to remove the oldest which will be at the beginning of the list
-                    const [firstNode, ...rest] = this.hash[leastUsedCount];
+                    const [firstNode, ...rest] = this.countHash[leastUsedCount];
                     keyToDelete = firstNode.key;
                     this.countHash[leastUsedCount] = rest;
                 }
@@ -135,11 +159,12 @@ class LFUCache {
             const originalNode = {...this.hash[key] };
             this.hash[key].count++;
             // we will increment the count and insert it into the list. If it does not exist we will create it
+            if (!(this.hash[key].count in this.countHash)) this.countHash[this.hash[key].count] = [this.hash[key]];
+            else this.countHash[this.hash[key].count].push(this.hash[key]);
             
             // we will filter out the original node from the current count array. If that makes the array empty then we will delete that key from countHash
-             
-            
-            
+            if (this.countHash[originalNode.count].length === 1) delete this.countHash[originalNode.count]
+            else this.countHash[originalNode.count] = this.countHash[originalNode.count].filter(x => x.key !== originalNode.key);
         }
            
     }
@@ -155,6 +180,17 @@ class LFUCache {
    
 }
 
+
+/** 
+ * Your LFUCache object will be instantiated and called as such:
+ * var obj = new LFUCache(capacity)
+ * var param_1 = obj.get(key)
+ * obj.put(key,value)
+ */
+
+//  let x = new LFUCache(1);
+//  x.put(1,1)
+//  x.put(2,2)
 
 
 ```
