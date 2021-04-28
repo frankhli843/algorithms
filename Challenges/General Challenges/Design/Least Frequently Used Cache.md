@@ -61,7 +61,7 @@ At most 105 calls will be made to get and put.
 
 # Code
 
-<details><summary>hashmap, hashmap, list</summary>
+<details><summary>My original solution: hashmap, hashmap, list 316ms</summary>
  
  ```js
   /** 
@@ -180,3 +180,114 @@ class LFUCache {
 ```
 
 </details>
+
+<details><summary>Fastest on record: 188ms</summary>
+ 
+ ```js
+ /**
+ * @param {number} capacity
+ */
+var LFUCache = function(capacity) {
+    this.capacity = capacity
+    this.keyCount = new Map() // key to index pairing
+    this.cache = new Map()
+    this.count = [new Set()]
+};
+
+/** 
+ * @param {number} key
+ * @return {number}
+ */
+LFUCache.prototype.get = function(key) {
+    // console.log('get', {
+    //     key,
+    //     has: this.cache.has(key)
+    // })
+    if (this.cache.has(key)) {
+
+        this.addCount(key)
+        return this.cache.get(key)
+    }
+    return -1
+};
+
+/** 
+ * @param {number} key 
+ * @param {number} value
+ * @return {void}
+ */
+LFUCache.prototype.put = function(key, value) {
+    // console.log('put', {
+    //     key,
+    //     value,
+    // })
+    const success = this.addCount(key)
+    if (success) {
+    this.cache.set(key, value)
+    }
+};
+
+/** 
+ * Your LFUCache object will be instantiated and called as such:
+ * var obj = new LFUCache(capacity)
+ * var param_1 = obj.get(key)
+ * obj.put(key,value)
+ */
+LFUCache.prototype.addCount = function(key) {
+    const keyCount = this.keyCount.has(key) ? this.keyCount.get(key) : 0
+    
+//     console.log("t", {
+//         key,
+//         keyCount,
+//         capacity: this.capacity
+//     })
+    
+    if (keyCount === 0) {
+            // newly added key
+        // check capacity
+        if (this.capacity === 0) {
+            // evict old key here
+            let evicted;
+            let min = 0;
+            while(this.count[min] != null) {
+            // console.log('while', {
+            //     min,
+            //     count: this.count[min],
+            //     size: this.count[min].size
+            // })
+                if(this.count[min].size) {
+                    evicted = this.count[min].values().next().value
+                    break;
+                }
+                min++
+            }
+            // console.log('evicted', {
+            //     evicted,
+            //     min,
+            //     count: this.count
+            // })
+            if (evicted != null) {
+                this.count[min].delete(evicted)
+                this.cache.delete(evicted)
+                this.keyCount.delete(evicted)
+            } else {
+                return false;
+            }
+        } else {
+            this.capacity -= 1
+        }
+    } else {
+        
+        // remove from old set
+        this.count[keyCount-1].delete(key)
+    }
+    // add to new set
+    if (this.count[keyCount] == null) {
+        this.count[keyCount] = new Set()
+    }
+    this.count[keyCount].add(key)
+     this.keyCount.set(key, keyCount + 1)
+    return true
+};
+
+```
