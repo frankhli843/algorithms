@@ -61,10 +61,10 @@ At most 105 calls will be made to get and put.
 
 # Code
 
-<details><summary>Click to expand</summary>
+<details><summary>hashmap, hashmap, list</summary>
  
  ```js
- /** 
+  /** 
  
     The plan here is to keep a hashmap for each key and value to make sure get is O(1).
     
@@ -108,17 +108,15 @@ class LFUCache {
         if (!(key in this.hash)){ 
             // case 1.1: over capacity, remove the least used
             if (this.capacity === this.count){ // here we have a list of each count
-                const leastUsedCount = parseInt(Object.keys(this.countHash).sort((a,b) => a - b)[0]);
+                const leastUsedCount = Object.keys(this.countHash).sort((a,b) => a - b)[0];
                 let keyToDelete;
                 // if there is only 1 then we remove it 
                 if (this.countHash[leastUsedCount].length === 1){
                     keyToDelete = this.countHash[leastUsedCount][0].key;
-                    this.countHash[leastUsedCount] = [];
+                    delete this.countHash[leastUsedCount];
                 }
                 else { // otherwise since the array is acting as a queue we we know we want to remove the oldest which will be at the beginning of the list
-                    const [firstNode, ...rest] = this.countHash[leastUsedCount];
-                    keyToDelete = firstNode.key;
-                    this.countHash[leastUsedCount] = rest;
+                    keyToDelete = this.countHash[leastUsedCount].shift().key;
                 }
                 delete this.hash[keyToDelete];  // remove from hash
                 this.count--;
@@ -173,19 +171,12 @@ class LFUCache {
     
    
 }
-
-
 /** 
  * Your LFUCache object will be instantiated and called as such:
  * var obj = new LFUCache(capacity)
  * var param_1 = obj.get(key)
  * obj.put(key,value)
  */
-
- let x = new LFUCache(1);
- x.put(1,1)
- x.put(2,2)
-
 ```
 
 </details>
