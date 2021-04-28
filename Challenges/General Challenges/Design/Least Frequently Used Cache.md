@@ -64,30 +64,6 @@ At most 105 calls will be made to get and put.
 <details><summary>Click to expand</summary>
  
  ```js
-  /** 
- 
-    The plan here is to keep a hashmap for each key and value to make sure get is O(1).
-    
-    For deciding which value to remove we keep a hashmap with count as key so that 
-    for a given interaction count there is an array for each node. Each array which holds
-    nodes with a given amount of iteration will act as a queue where we append later additions
-    and remove earlier ones since they will be older.
-    i.e. 
-    {
-        1: [{key: 'favorite food', value: 'chicken', count: 1}, {key: 'computer', value: 'macbook', count: 1}],   
-        2: [{key: 'favorite drink', value: 'water', count: 2}]
-    }
-    So our algorithm will get the lowest count array in this it is 1
-    [{key: 'favorite food', value: 'chicken', count: 1}, {key: 'computer', value: 'macbook', count: 1}]
-    then it will remove the first of the list since it would be the oldest
-    
-    @member countHash {[retrieveCount: number]: Node[] }
-    @member hash {[key: string]: Node } for quick retrival
-    Node will be { date: string, key: string, value: any, count: number }
-    
-    
- */
-
  /** 
  
     The plan here is to keep a hashmap for each key and value to make sure get is O(1).
@@ -119,13 +95,15 @@ class LFUCache {
     count;
     
     constructor(capacity){
-        if (capacity <= 0) throw "capacity must be at least 1 or larger"
         this.capacity = capacity; 
-        this.countHash = {};  // {capacity: Node[]}
-        this.hash = {}; // {key}
+        this.countHash = new Map();  // {capacity: Node[]}
+        this.hash = new Map(); // {key}
         this.count = 0;
     }
     put(key, value){
+        // no capacity so we don't need anything
+        if (this.capacity === 0) return;
+        
         // case 1: new value
         if (!(key in this.hash)){ 
             // case 1.1: over capacity, remove the least used
@@ -156,15 +134,16 @@ class LFUCache {
         // case 2: existing value
         else {
             // since key exists we will get the original node
-            const originalNode = {...this.hash[key] };
+            const originalCount = this.hash[key].count;
             this.hash[key].count++;
+            this.hash[key].value = value;
             // we will increment the count and insert it into the list. If it does not exist we will create it
             if (!(this.hash[key].count in this.countHash)) this.countHash[this.hash[key].count] = [this.hash[key]];
             else this.countHash[this.hash[key].count].push(this.hash[key]);
             
             // we will filter out the original node from the current count array. If that makes the array empty then we will delete that key from countHash
-            if (this.countHash[originalNode.count].length === 1) delete this.countHash[originalNode.count]
-            else this.countHash[originalNode.count] = this.countHash[originalNode.count].filter(x => x.key !== originalNode.key);
+            if (this.countHash[originalCount].length === 1) delete this.countHash[originalCount]
+            else this.countHash[originalCount] = this.countHash[originalCount].filter(x => x.key !== key);
         }
            
     }
@@ -175,7 +154,22 @@ class LFUCache {
      * @param {number} key
      * @return {number}
      */
-    get(key){}
+    get(key){
+        if (key in this.hash){
+            // since key exists we will get the original node
+           const originalCount = this.hash[key].count;
+            this.hash[key].count++;
+            // we will increment the count and insert it into the list. If it does not exist we will create it
+            if (!(this.hash[key].count in this.countHash)) this.countHash[this.hash[key].count] = [this.hash[key]];
+            else this.countHash[this.hash[key].count].push(this.hash[key]);
+
+            // we will filter out the original node from the current count array. If that makes the array empty then we will delete that key from countHash
+            if (this.countHash[originalCount].length === 1) delete this.countHash[originalCount]
+            else this.countHash[originalCount] = this.countHash[originalCount].filter(x => x.key !== key);
+            return this.hash[key].value;
+        }
+        return -1
+    }
     
    
 }
@@ -188,10 +182,9 @@ class LFUCache {
  * obj.put(key,value)
  */
 
-//  let x = new LFUCache(1);
-//  x.put(1,1)
-//  x.put(2,2)
-
+ let x = new LFUCache(1);
+ x.put(1,1)
+ x.put(2,2)
 
 ```
 
