@@ -410,16 +410,16 @@ class LFUCache {
     const keyCount = this.keyCount.has(key) ? this.keyCount.get(key) : 0;  // default is 0 because at 0 index is the first set of counts
     if (keyCount === 0) { // newly added key      
         if (this.capacity === 0) { // no more capacity so we need to remove one
-            let keyToRemove, min = 0;
-            while(this.countSets[min] != null) { // we go through all the different counts until we find set that is defined
-                if (this.countSets[min].size) {  // if size is 0 then it is evaluated as false here
-                    keyToRemove = this.countSets[min].values().next().value
+            let keyToRemove, minCountIndex = 0;
+            while(this.countSets[minCountIndex]) { // we go through all the different counts until we find set that is defined
+                if (this.countSets[minCountIndex].size) {  // if size is 0 then it is evaluated as false here
+                    keyToRemove = this.countSets[minCountIndex].values().next().value;
                     break;
                 }
-                min++;
+                minCountIndex++;
             }
             if (keyToRemove != null) { // if there is at least one key to delete
-                this.countSets[min].delete(keyToRemove);
+                this.countSets[minCountIndex].delete(keyToRemove);
                 this.cache.delete(keyToRemove);
                 this.keyCount.delete(keyToRemove);
             } 
