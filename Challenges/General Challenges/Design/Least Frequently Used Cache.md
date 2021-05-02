@@ -402,17 +402,16 @@ class LFUCache {
     return -1
   };
   put(key, value) {
-    const success = this.addCount(key)
-    if (success) this.cache.set(key, value)
+    const isNew = this.addCount(key)
+    if (isNew) this.cache.set(key, value);
   };
-
-  addCount(key){
-    const keyCount = this.keyCount.has(key) ? this.keyCount.get(key) : 0;
+  
+  addCount(key){  // returns true if new key, false otherwise
+    const keyCount = this.keyCount.has(key) ? this.keyCount.get(key) : 0;  // default is 0 because at 0 index is the first set of counts
     if (keyCount === 0) { // newly added key      
         if (this.capacity === 0) { // no more capacity so we need to remove one
-            let keyToRemove; // evict old key here
-            let min = 0;
-            while(this.countSets[min] != null) { // we go through all the different counts until we find one that is not 0
+            let keyToRemove, min = 0;
+            while(this.countSets[min] != null) { // we go through all the different counts until we find set that is defined
                 if (this.countSets[min].size) {  // if size is 0 then it is evaluated as false here
                     keyToRemove = this.countSets[min].values().next().value
                     break;
@@ -424,7 +423,7 @@ class LFUCache {
                 this.cache.delete(keyToRemove);
                 this.keyCount.delete(keyToRemove);
             } 
-            else return false;
+            else return false;  // is not new
         } 
         else this.capacity--;  // we just add one in since there is still room
     }
@@ -434,7 +433,7 @@ class LFUCache {
     if (this.countSets[keyCount] == null) this.countSets[keyCount] = new Set();
     this.countSets[keyCount].add(key);
     this.keyCount.set(key, keyCount + 1);
-    return true;
+    return true;  // is new
   };
 }
 ```
