@@ -64,6 +64,7 @@ At most 105 calls will be made to get and put.
 <details><summary>My original solution: 72 lines, 316 ms, hashmap, hashmap</summary>
  - The plan here is to keep a hashmap for each key and value to make sure get is O(1).
  - For deciding which value to remove we keep a hashmap with count as key so that for a given interaction count there is an array for each node. Each array which holds nodes with a given amount of iteration will act as a queue where we append later additions and remove earlier ones since they will be older.
+ 
  ```
     i.e. 
     {
@@ -71,7 +72,9 @@ At most 105 calls will be made to get and put.
         2: [{key: 'favorite drink', value: 'water', count: 2}]
     }
 ```
+
 - So our algorithm will get the lowest count array in this it is 1
+
 ```
     [{key: 'favorite food', value: 'chicken', count: 1}, {key: 'computer', value: 'macbook', count: 1}]
     then it will remove the first of the list since it would be the oldest
