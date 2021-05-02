@@ -11,16 +11,18 @@ To determine the least frequently used key, a use counter is maintained for each
 When a key is first inserted into the cache, its use counter is set to 1 (due to the put operation). The use counter for a key in the cache is incremented either a get or put operation is called on it.
 
  
-```
-Example 1:
 
+### Example 1:
+```
 Input
 ["LFUCache", "put", "put", "get", "put", "get", "get", "put", "get", "get", "get"]
 [[2], [1, 1], [2, 2], [1], [3, 3], [2], [3], [4, 4], [1], [3], [4]]
 Output
 [null, null, null, 1, null, -1, 3, null, -1, 3, 4]
+```
 
-Explanation
+### Explanation
+```js
 // cnt(x) = the use counter for key x
 // cache=[] will show the last used order for tiebreakers (leftmost element is  most recent)
 LFUCache lfu = new LFUCache(2);
@@ -40,49 +42,31 @@ lfu.get(3);      // return 3
                  // cache=[3,4], cnt(4)=1, cnt(3)=3
 lfu.get(4);      // return 4
                  // cache=[3,4], cnt(4)=2, cnt(3)=3
- 
-
-Constraints:
-
-0 <= capacity, key, value <= 104
-At most 105 calls will be made to get and put.
-
 ```
 
+### Constraints:
+- 0 <= capacity, key, value <= 104
+- At most 105 calls will be made to get and put.
 
-```
-/** 
- * Your LFUCache object will be instantiated and called as such:
- * var obj = new LFUCache(capacity)
- * var param_1 = obj.get(key)
- * obj.put(key,value)
- */
- ```
-
-# Code
-
+### Code
 <details><summary>My original solution: 72 lines, 316 ms, hashmap, hashmap</summary>
- - The plan here is to keep a hashmap for each key and value to make sure get is O(1).
- - For deciding which value to remove we keep a hashmap with count as key so that for a given interaction count there is an array for each node. Each array which holds nodes with a given amount of iteration will act as a queue where we append later additions and remove earlier ones since they will be older.
  
- ```
+ ```js
+  /** 
+  The plan here is to keep a hashmap for each key and value to make sure get is O(1).
+    
+    For deciding which value to remove we keep a hashmap with count as key so that 
+    for a given interaction count there is an array for each node. Each array which holds
+    nodes with a given amount of iteration will act as a queue where we append later additions
+    and remove earlier ones since they will be older.
     i.e. 
     {
         1: [{key: 'favorite food', value: 'chicken', count: 1}, {key: 'computer', value: 'macbook', count: 1}],   
         2: [{key: 'favorite drink', value: 'water', count: 2}]
     }
-```
-
-- So our algorithm will get the lowest count array in this it is 1
-
-```
+    So our algorithm will get the lowest count array in this it is 1
     [{key: 'favorite food', value: 'chicken', count: 1}, {key: 'computer', value: 'macbook', count: 1}]
     then it will remove the first of the list since it would be the oldest
-```
- 
- ```js
-  /** 
- 
     
     @member countHash {[retrieveCount: number]: Node[] }
     @member hash {[key: string]: Node } for quick retrival
