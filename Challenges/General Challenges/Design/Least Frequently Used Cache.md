@@ -390,9 +390,9 @@ class LFUCache {
 class LFUCache {
   constructor(capacity){
     this.capacity = capacity
-    this.countHash = new Map() // key to index pairing
-    this.cache = new Map()
-    this.count = [new Set()]
+    this.keyCount = new Map() // {[key: number]: count} 
+    this.cache = new Map(); // {[key: number]: value}
+    this.countSets = [new Set()];  // where the index + 1 is the amount of accesses and set contains an ordered list of keys
   }
   get(key) {
     if (this.cache.has(key)) {
@@ -407,34 +407,33 @@ class LFUCache {
   };
 
   addCount(key){
-    const keyCount = this.countHash.has(key) ? this.countHash.get(key) : 0
+    const keyCount = this.keyCount.has(key) ? this.keyCount.get(key) : 0;
     if (keyCount === 0) { // newly added key      
-        if (this.capacity === 0) { // check capacity
-            let evicted; // evict old key here
+        if (this.capacity === 0) { // no more capacity so we need to remove one
+            let keyToRemove; // evict old key here
             let min = 0;
-            while(this.count[min] != null) {
-                if(this.count[min].size) {
-                    evicted = this.count[min].values().next().value
+            while(this.countSets[min] != null) { // we go through all the different counts until we find one that is not 0
+                if (this.countSets[min].size) {  // if size is 0 then it is evaluated as false here
+                    keyToRemove = this.countSets[min].values().next().value
                     break;
                 }
                 min++;
             }
-            if (evicted != null) {
-                this.count[min].delete(evicted);
-                this.cache.delete(evicted);
-                this.countHash.delete(evicted);
+            if (keyToRemove != null) { // if there is at least one key to delete
+                this.countSets[min].delete(keyToRemove);
+                this.cache.delete(keyToRemove);
+                this.keyCount.delete(keyToRemove);
             } 
             else return false;
-            
         } 
-        else this.capacity--;
+        else this.capacity--;  // we just add one in since there is still room
     }
-    else this.count[keyCount-1].delete(key); // remove from old set
+    else this.countSets[keyCount-1].delete(key); // remove from old set since we will be moving to new set, we subtract 1 here b/c of indexing
 
     // add to new set
-    if (this.count[keyCount] == null) this.count[keyCount] = new Set()
-    this.count[keyCount].add(key);
-    this.countHash.set(key, keyCount + 1);
+    if (this.countSets[keyCount] == null) this.countSets[keyCount] = new Set();
+    this.countSets[keyCount].add(key);
+    this.keyCount.set(key, keyCount + 1);
     return true;
   };
 }
