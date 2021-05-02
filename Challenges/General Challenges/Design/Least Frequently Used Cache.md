@@ -180,11 +180,131 @@ class LFUCache {
 </details>
 
 <details><summary>second iteration: hashmap, hashmap, double linked list 236ms</summary>
+ - In this iteration I replaced a regular list with a linked list to remove the O(n) complexity of removing the first from the list
+
+ ```js
+
+ class LFUCache {
+    capacity;
+    hash; 
+    countHash;
+    count;
+    
+    constructor(capacity){
+        // console.log(`l = new LFUCache(${capacity})`)
+        this.capacity = capacity; 
+        this.countHash = {};  // {capacity: Node[]}
+        this.hash = {}; // {first: Node, last: Node}
+        this.count = 0;
+    }
+    put(key, value){
+        // console.log(`l.put(${key}, ${value})`)
+        // no capacity so we don't need anything
+        if (this.capacity === 0) return;
+        
+        // case 1: new value
+        if (!(key in this.hash)){ 
+            // case 1.1: over capacity, remove the least used
+            if (this.capacity === this.count){ // here we have a list of each count
+                const leastUsedCount = Object.keys(this.countHash).sort((a,b) => a - b)[0];  // get the smallest count
+                const keyToDelete = this.countHash[leastUsedCount].first.key;
+                this.countHash[leastUsedCount].first = this.countHash[leastUsedCount].first.next;
+                if (this.countHash[leastUsedCount].first) this.countHash[leastUsedCount].first.parent = null;       
+                // if there is now nothing pointing at the given count then we can remove this.countHash[leastUsedCount]
+                if (!this.countHash[leastUsedCount].first) delete this.countHash[leastUsedCount];
+                delete this.hash[keyToDelete];  // remove from hash
+                this.count--;
+            }
+            
+            // create new node and add it 
+            this.hash[key] = { key: key, value: value, count: 1, next: null, parent: null};
+            // case 1.21: count of 1 already exists
+            if (1 in this.countHash) { // change the last pointer and append it to the linkedlist chain
+                const secondLast = this.countHash[1].last;
+                secondLast.next = this.hash[key];
+                this.hash[key].parent = secondLast;
+                this.countHash[1].last = this.hash[key];
+            }
+            // case 1.22: create a new count of 1 chain
+            else 
+                this.countHash[1] = { first: this.hash[key], last: this.hash[key] }; 
+    
+            this.count++;
+        }
+        // case 2: existing value
+        else {
+            this.hash[key].value = value;
+            this.incrementCount(key);
+        }
+    }
+    
+    
+    
+    /** 
+     * @param {number} key
+     * @return {number}
+     */
+    get(key){
+        // console.log(`l.get(${key})`)
+        if (key in this.hash){
+            this.incrementCount(key);
+            return this.hash[key].value;
+        }
+        return -1
+    }
+    
+    incrementCount(key){
+        const originalNode = {...this.hash[key]};
+        const originalCount = originalNode.count;
+        this.hash[key].count++;
+        const newCount = this.hash[key].count;
+        
+
+        // Adding into new count list
+        if (!(newCount in this.countHash)) { // count does not exist right now
+            this.countHash[newCount] = {first: this.hash[key], last: this.hash[key]};
+        }
+        else { // already exists then we insert it into the list
+            const secondLast = this.countHash[newCount].last;
+            this.countHash[newCount].last = this.hash[key];
+            this.hash[key].parent = secondLast;
+            secondLast.next = this.hash[key];
+        }
+
+        // we will filter out the original node from the original count linkedlist 
+        // case 1: if the linkedlist has the node as first and last then its the only node so we remove the list all together
+        if (this.countHash[originalCount].first.key === key && this.countHash[originalCount].last.key === key) 
+            delete this.countHash[originalCount];
+        // case 2: otherwise we need to remove it from the linkedlist
+        else {  
+            // case 2.1: first of the list
+            if (this.countHash[originalCount].first.key === key) {
+                this.countHash[originalCount].first = originalNode.next;
+                originalNode.next.previous = null;
+            } 
+            // case 2.2: at the end of the list
+            else if (this.countHash[originalCount].last.key === key) {
+                originalNode.parent.next = null;
+                this.countHash[originalCount].last = originalNode.parent;
+            }
+            // case 2.3: somewhere in the middle
+            else {
+                originalNode.parent.next = originalNode.next;
+                originalNode.next.parent = originalNode.parent;
+            }
+        } 
+    }
+   
+}
+```
+
+</details>
+
+<details><summary>second iteration: hashmap, hashmap, double linked list, least frequently used counter 220ms</summary>
+ - In this iteration I got the insight that I can keep track of the least frequent list instead of having to sort it each time
  
  ```js
-   /** 
-  In this iteration I replaced a regular list with a linked list to remove the O(n) complexity of removing the first from the list
- */
+
  class LFUCache {
     capacity;
     hash; 
