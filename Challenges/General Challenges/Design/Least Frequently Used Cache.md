@@ -62,23 +62,24 @@ At most 105 calls will be made to get and put.
 # Code
 
 <details><summary>My original solution: 72 lines, 316 ms, hashmap, hashmap</summary>
- 
- ```js
-  /** 
-  The plan here is to keep a hashmap for each key and value to make sure get is O(1).
-    
-    For deciding which value to remove we keep a hashmap with count as key so that 
-    for a given interaction count there is an array for each node. Each array which holds
-    nodes with a given amount of iteration will act as a queue where we append later additions
-    and remove earlier ones since they will be older.
+ - The plan here is to keep a hashmap for each key and value to make sure get is O(1).
+ - For deciding which value to remove we keep a hashmap with count as key so that for a given interaction count there is an array for each node. Each array which holds nodes with a given amount of iteration will act as a queue where we append later additions and remove earlier ones since they will be older.
+ ```
     i.e. 
     {
         1: [{key: 'favorite food', value: 'chicken', count: 1}, {key: 'computer', value: 'macbook', count: 1}],   
         2: [{key: 'favorite drink', value: 'water', count: 2}]
     }
-    So our algorithm will get the lowest count array in this it is 1
+```
+- So our algorithm will get the lowest count array in this it is 1
+```
     [{key: 'favorite food', value: 'chicken', count: 1}, {key: 'computer', value: 'macbook', count: 1}]
     then it will remove the first of the list since it would be the oldest
+```
+ 
+ ```js
+  /** 
+ 
     
     @member countHash {[retrieveCount: number]: Node[] }
     @member hash {[key: string]: Node } for quick retrival
@@ -398,7 +399,7 @@ class LFUCache {
 </details>
 
 <details><summary>Fastest on record: 200ms, 48 lines, 2 maps, [Set()] </summary>
- 
+
  ```js
 class LFUCache {
   constructor(capacity){
@@ -430,12 +431,12 @@ class LFUCache {
                     evicted = this.count[min].values().next().value
                     break;
                 }
-                min++
+                min++;
             }
             if (evicted != null) {
-                this.count[min].delete(evicted)
-                this.cache.delete(evicted)
-                this.countHash.delete(evicted)
+                this.count[min].delete(evicted);
+                this.cache.delete(evicted);
+                this.countHash.delete(evicted);
             } 
             else return false;
             
@@ -446,9 +447,9 @@ class LFUCache {
 
     // add to new set
     if (this.count[keyCount] == null) this.count[keyCount] = new Set()
-    this.count[keyCount].add(key)
-    this.countHash.set(key, keyCount + 1)
-    return true
+    this.count[keyCount].add(key);
+    this.countHash.set(key, keyCount + 1);
+    return true;
   };
 }
 ```
