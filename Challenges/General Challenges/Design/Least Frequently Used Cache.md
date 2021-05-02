@@ -61,7 +61,7 @@ At most 105 calls will be made to get and put.
 
 # Code
 
-<details><summary>My original solution: hashmap, hashmap, list 316ms</summary>
+<details><summary>My original solution: 72 lines, 316 ms, hashmap, hashmap</summary>
  
  ```js
   /** 
@@ -85,7 +85,6 @@ At most 105 calls will be made to get and put.
     Node will be { date: string, key: string, value: any, count: number }
 
  */
-
 class LFUCache {
     capacity;
     hash; 
@@ -166,24 +165,15 @@ class LFUCache {
         }
         return -1
     }
-    
-   
 }
-/** 
- * Your LFUCache object will be instantiated and called as such:
- * var obj = new LFUCache(capacity)
- * var param_1 = obj.get(key)
- * obj.put(key,value)
- */
 ```
 
 </details>
 
-<details><summary>second iteration: hashmap, hashmap, double linked list 236ms</summary>
+<details><summary>second iteration: 97 lines, 236ms, hashmap, hashmap, double linked list </summary>
  - In this iteration I replaced a regular list with a linked list to remove the O(n) complexity of removing the first from the list
 
  ```js
-
  class LFUCache {
     capacity;
     hash; 
@@ -191,16 +181,13 @@ class LFUCache {
     count;
     
     constructor(capacity){
-        // console.log(`l = new LFUCache(${capacity})`)
         this.capacity = capacity; 
         this.countHash = {};  // {capacity: Node[]}
         this.hash = {}; // {first: Node, last: Node}
         this.count = 0;
     }
     put(key, value){
-        // console.log(`l.put(${key}, ${value})`)
-        // no capacity so we don't need anything
-        if (this.capacity === 0) return;
+        if (this.capacity === 0) return; // no capacity so we don't need anything
         
         // case 1: new value
         if (!(key in this.hash)){ 
@@ -237,8 +224,6 @@ class LFUCache {
             this.incrementCount(key);
         }
     }
-    
-    
     
     /** 
      * @param {number} key
@@ -294,17 +279,15 @@ class LFUCache {
             }
         } 
     }
-   
 }
 ```
 
 </details>
 
-<details><summary>third iteration: hashmap, hashmap, double linked list, least frequently used counter 220ms</summary>
+<details><summary>third iteration: 97 lines, 220ms, hashmap, hashmap, double linked list, least frequently used counter </summary>
  - In this iteration I got the insight that I can keep track of the least frequent list instead of having to sort it each time
  
  ```js
-
  class LFUCache {
     capacity;
     hash; 
@@ -312,16 +295,13 @@ class LFUCache {
     count;
     
     constructor(capacity){
-        // console.log(`l = new LFUCache(${capacity})`)
         this.capacity = capacity; 
         this.countHash = {};  // {capacity: Node[]}
         this.hash = {}; // {first: Node, last: Node}
         this.count = 0;
     }
     put(key, value){
-        // console.log(`l.put(${key}, ${value})`)
-        // no capacity so we don't need anything
-        if (this.capacity === 0) return;
+        if (this.capacity === 0) return; // no capacity so we don't need anything
         
         // case 1: new value
         if (!(key in this.hash)){ 
@@ -359,8 +339,6 @@ class LFUCache {
         }
     }
     
-    
-    
     /** 
      * @param {number} key
      * @return {number}
@@ -379,8 +357,7 @@ class LFUCache {
         const originalCount = originalNode.count;
         this.hash[key].count++;
         const newCount = this.hash[key].count;
-        
-
+      
         // Adding into new count list
         if (!(newCount in this.countHash)) { // count does not exist right now
             this.countHash[newCount] = {first: this.hash[key], last: this.hash[key]};
@@ -415,93 +392,63 @@ class LFUCache {
             }
         } 
     }
-   
 }
 ```
 
 </details>
 
-<details><summary>Fastest on record: 188ms</summary>
+<details><summary>Fastest on record: 200ms, 48 lines, 2 maps, [Set()] </summary>
  
  ```js
- /**
- * @param {number} capacity
- */
-var LFUCache = function(capacity) {
-  this.keyToFreqMap = new Map();
-  this.freqToKeyMap = new Map();
-  this.keyToValMap = new Map();
-  this.capacity = capacity;
-  this.leastFreq = 0;
-
-};
-
-/** 
- * @param {number} key
- * @return {number}
- */
-LFUCache.prototype.get = function(key) {
-  if (this.keyToValMap.has(key)) {
-    this.leastFreq = freqAddOne(this.keyToFreqMap, this.freqToKeyMap, key, this.leastFreq);
-    return this.keyToValMap.get(key);
-  } else {
-    return -1;
+class LFUCache {
+  constructor(capacity){
+    this.capacity = capacity
+    this.countHash = new Map() // key to index pairing
+    this.cache = new Map()
+    this.count = [new Set()]
   }
-};
-
-/** 
- * @param {number} key 
- * @param {number} value
- * @return {void}
- */
-LFUCache.prototype.put = function(key, value) {
-  if (this.capacity > 0) {
-    // pop out least frequency used
-    if (this.keyToValMap.size >= this.capacity && !this.keyToValMap.has(key)) {
-      // Step 1: figure which one is the least frequenty used
-      var leastFreqSet = this.freqToKeyMap.get(this.leastFreq)
-      // Since set is inserted according insertion order, the head of the set must be the least recently used item
-      var leastUsedKey = leastFreqSet.values().next().value;
-      
-      // remove it from all our maps
-      leastFreqSet.delete(leastUsedKey);
-      if (leastFreqSet.size === 0) {
-        this.freqToKeyMap.delete(this.leastFreq);
-        // Since the last entry on the leastFreq set is removed, so the next leastFreq will be +1 from current
-        this.leastFreq++;
-      }
-      this.keyToFreqMap.delete(leastUsedKey);
-      this.keyToValMap.delete(leastUsedKey);
+  get(key) {
+    if (this.cache.has(key)) {
+        this.addCount(key)
+        return this.cache.get(key)
     }
-    // We haven't seen this before, so leastFreq will be set back to 1
-    if (!this.keyToValMap.has(key)) {
-      this.leastFreq = 1;
-    }
-    // update our leastFreq count
-    this.leastFreq = freqAddOne(this.keyToFreqMap, this.freqToKeyMap, key, this.leastFreq);
-    this.keyToValMap.set(key, value);
-  }
-};
+    return -1
+  };
+  put(key, value) {
+    const success = this.addCount(key)
+    if (success) this.cache.set(key, value)
+  };
 
-function freqAddOne(keyToFreqMap, freqToKeyMap, key, leastFreq) {
-  // Add this key to our cache
-  // update keyToFreqMap
-  var freq = keyToFreqMap.get(key) + 1 || 1;
-  keyToFreqMap.set(key, freq);
-
-  // update freqToKeyMap
-  if (freq > 1) {
-    var oldFreq = freq - 1;
-    var oldFreqSet = freqToKeyMap.get(oldFreq);
-    oldFreqSet.delete(key);
-    if (oldFreqSet.size === 0) {
-      freqToKeyMap.delete(oldFreq)
-      if (oldFreq === leastFreq) leastFreq++;
+  addCount(key){
+    const keyCount = this.countHash.has(key) ? this.countHash.get(key) : 0
+    if (keyCount === 0) { // newly added key      
+        if (this.capacity === 0) { // check capacity
+            let evicted; // evict old key here
+            let min = 0;
+            while(this.count[min] != null) {
+                if(this.count[min].size) {
+                    evicted = this.count[min].values().next().value
+                    break;
+                }
+                min++
+            }
+            if (evicted != null) {
+                this.count[min].delete(evicted)
+                this.cache.delete(evicted)
+                this.countHash.delete(evicted)
+            } 
+            else return false;
+            
+        } 
+        else this.capacity--;
     }
-  }
-  var set = freqToKeyMap.get(freq) || new Set();
-  set.add(key);
-  freqToKeyMap.set(freq, set);
-  return leastFreq;
+    else this.count[keyCount-1].delete(key); // remove from old set
+
+    // add to new set
+    if (this.count[keyCount] == null) this.count[keyCount] = new Set()
+    this.count[keyCount].add(key)
+    this.countHash.set(key, keyCount + 1)
+    return true
+  };
 }
 ```
