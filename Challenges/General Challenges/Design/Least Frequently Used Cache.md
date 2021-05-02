@@ -65,27 +65,7 @@ At most 105 calls will be made to get and put.
  
  ```js
   /** 
- 
-    The plan here is to keep a hashmap for each key and value to make sure get is O(1).
-    
-    For deciding which value to remove we keep a hashmap with count as key so that 
-    for a given interaction count there is an array for each node. Each array which holds
-    nodes with a given amount of iteration will act as a queue where we append later additions
-    and remove earlier ones since they will be older.
-    i.e. 
-    {
-        1: [{key: 'favorite food', value: 'chicken', count: 1}, {key: 'computer', value: 'macbook', count: 1}],   
-        2: [{key: 'favorite drink', value: 'water', count: 2}]
-    }
-    So our algorithm will get the lowest count array in this it is 1
-    [{key: 'favorite food', value: 'chicken', count: 1}, {key: 'computer', value: 'macbook', count: 1}]
-    then it will remove the first of the list since it would be the oldest
-    
-    @member countHash {[retrieveCount: number]: Node[] }
-    @member hash {[key: string]: Node } for quick retrival
-    Node will be { date: string, key: string, value: any, count: number }
-    
-    
+  In this iteration I replaced a regular list with a linked list to remove the O(n) complexity of removing the first from the list
  */
 
 class LFUCache {
@@ -181,6 +161,125 @@ class LFUCache {
 
 </details>
 
+<details><summary>second iteration: hashmap, hashmap, double linked list 236ms</summary>
+ 
+ ```js
+ class LFUCache {
+    capacity;
+    hash; 
+    countHash;
+    count;
+    
+    constructor(capacity){
+        // console.log(`l = new LFUCache(${capacity})`)
+        this.capacity = capacity; 
+        this.countHash = {};  // {capacity: Node[]}
+        this.hash = {}; // {first: Node, last: Node}
+        this.count = 0;
+    }
+    put(key, value){
+        // console.log(`l.put(${key}, ${value})`)
+        // no capacity so we don't need anything
+        if (this.capacity === 0) return;
+        
+        // case 1: new value
+        if (!(key in this.hash)){ 
+            // case 1.1: over capacity, remove the least used
+            if (this.capacity === this.count){ // here we have a list of each count
+                const leastUsedCount = Object.keys(this.countHash).sort((a,b) => a - b)[0];  // get the smallest count
+                const keyToDelete = this.countHash[leastUsedCount].first.key;
+                this.countHash[leastUsedCount].first = this.countHash[leastUsedCount].first.next;
+                if (this.countHash[leastUsedCount].first) this.countHash[leastUsedCount].first.parent = null;       
+                // if there is now nothing pointing at the given count then we can remove this.countHash[leastUsedCount]
+                if (!this.countHash[leastUsedCount].first) delete this.countHash[leastUsedCount];
+                delete this.hash[keyToDelete];  // remove from hash
+                this.count--;
+            }
+            
+            // create new node and add it 
+            this.hash[key] = { key: key, value: value, count: 1, next: null, parent: null};
+            // case 1.21: count of 1 already exists
+            if (1 in this.countHash) { // change the last pointer and append it to the linkedlist chain
+                const secondLast = this.countHash[1].last;
+                secondLast.next = this.hash[key];
+                this.hash[key].parent = secondLast;
+                this.countHash[1].last = this.hash[key];
+            }
+            // case 1.22: create a new count of 1 chain
+            else 
+                this.countHash[1] = { first: this.hash[key], last: this.hash[key] }; 
+    
+            this.count++;
+        }
+        // case 2: existing value
+        else {
+            this.hash[key].value = value;
+            this.incrementCount(key);
+        }
+    }
+    
+    
+    
+    /** 
+     * @param {number} key
+     * @return {number}
+     */
+    get(key){
+        // console.log(`l.get(${key})`)
+        if (key in this.hash){
+            this.incrementCount(key);
+            return this.hash[key].value;
+        }
+        return -1
+    }
+    
+    incrementCount(key){
+        const originalNode = {...this.hash[key]};
+        const originalCount = originalNode.count;
+        this.hash[key].count++;
+        const newCount = this.hash[key].count;
+        
+
+        // Adding into new count list
+        if (!(newCount in this.countHash)) { // count does not exist right now
+            this.countHash[newCount] = {first: this.hash[key], last: this.hash[key]};
+        }
+        else { // already exists then we insert it into the list
+            const secondLast = this.countHash[newCount].last;
+            this.countHash[newCount].last = this.hash[key];
+            this.hash[key].parent = secondLast;
+            secondLast.next = this.hash[key];
+        }
+
+        // we will filter out the original node from the original count linkedlist 
+        // case 1: if the linkedlist has the node as first and last then its the only node so we remove the list all together
+        if (this.countHash[originalCount].first.key === key && this.countHash[originalCount].last.key === key) 
+            delete this.countHash[originalCount];
+        // case 2: otherwise we need to remove it from the linkedlist
+        else {  
+            // case 2.1: first of the list
+            if (this.countHash[originalCount].first.key === key) {
+                this.countHash[originalCount].first = originalNode.next;
+                originalNode.next.previous = null;
+            } 
+            // case 2.2: at the end of the list
+            else if (this.countHash[originalCount].last.key === key) {
+                originalNode.parent.next = null;
+                this.countHash[originalCount].last = originalNode.parent;
+            }
+            // case 2.3: somewhere in the middle
+            else {
+                originalNode.parent.next = originalNode.next;
+                originalNode.next.parent = originalNode.parent;
+            }
+        } 
+    }
+   
+}
+```
+
+</details>
+
 <details><summary>Fastest on record: 188ms</summary>
  
  ```js
@@ -188,10 +287,12 @@ class LFUCache {
  * @param {number} capacity
  */
 var LFUCache = function(capacity) {
-    this.capacity = capacity
-    this.keyCount = new Map() // key to index pairing
-    this.cache = new Map()
-    this.count = [new Set()]
+  this.keyToFreqMap = new Map();
+  this.freqToKeyMap = new Map();
+  this.keyToValMap = new Map();
+  this.capacity = capacity;
+  this.leastFreq = 0;
+
 };
 
 /** 
@@ -199,16 +300,12 @@ var LFUCache = function(capacity) {
  * @return {number}
  */
 LFUCache.prototype.get = function(key) {
-    // console.log('get', {
-    //     key,
-    //     has: this.cache.has(key)
-    // })
-    if (this.cache.has(key)) {
-
-        this.addCount(key)
-        return this.cache.get(key)
-    }
-    return -1
+  if (this.keyToValMap.has(key)) {
+    this.leastFreq = freqAddOne(this.keyToFreqMap, this.freqToKeyMap, key, this.leastFreq);
+    return this.keyToValMap.get(key);
+  } else {
+    return -1;
+  }
 };
 
 /** 
@@ -217,77 +314,53 @@ LFUCache.prototype.get = function(key) {
  * @return {void}
  */
 LFUCache.prototype.put = function(key, value) {
-    // console.log('put', {
-    //     key,
-    //     value,
-    // })
-    const success = this.addCount(key)
-    if (success) {
-    this.cache.set(key, value)
+  if (this.capacity > 0) {
+    // pop out least frequency used
+    if (this.keyToValMap.size >= this.capacity && !this.keyToValMap.has(key)) {
+      // Step 1: figure which one is the least frequenty used
+      var leastFreqSet = this.freqToKeyMap.get(this.leastFreq)
+      // Since set is inserted according insertion order, the head of the set must be the least recently used item
+      var leastUsedKey = leastFreqSet.values().next().value;
+      
+      // remove it from all our maps
+      leastFreqSet.delete(leastUsedKey);
+      if (leastFreqSet.size === 0) {
+        this.freqToKeyMap.delete(this.leastFreq);
+        // Since the last entry on the leastFreq set is removed, so the next leastFreq will be +1 from current
+        this.leastFreq++;
+      }
+      this.keyToFreqMap.delete(leastUsedKey);
+      this.keyToValMap.delete(leastUsedKey);
     }
+    // We haven't seen this before, so leastFreq will be set back to 1
+    if (!this.keyToValMap.has(key)) {
+      this.leastFreq = 1;
+    }
+    // update our leastFreq count
+    this.leastFreq = freqAddOne(this.keyToFreqMap, this.freqToKeyMap, key, this.leastFreq);
+    this.keyToValMap.set(key, value);
+  }
 };
 
-/** 
- * Your LFUCache object will be instantiated and called as such:
- * var obj = new LFUCache(capacity)
- * var param_1 = obj.get(key)
- * obj.put(key,value)
- */
-LFUCache.prototype.addCount = function(key) {
-    const keyCount = this.keyCount.has(key) ? this.keyCount.get(key) : 0
-    
-//     console.log("t", {
-//         key,
-//         keyCount,
-//         capacity: this.capacity
-//     })
-    
-    if (keyCount === 0) {
-            // newly added key
-        // check capacity
-        if (this.capacity === 0) {
-            // evict old key here
-            let evicted;
-            let min = 0;
-            while(this.count[min] != null) {
-            // console.log('while', {
-            //     min,
-            //     count: this.count[min],
-            //     size: this.count[min].size
-            // })
-                if(this.count[min].size) {
-                    evicted = this.count[min].values().next().value
-                    break;
-                }
-                min++
-            }
-            // console.log('evicted', {
-            //     evicted,
-            //     min,
-            //     count: this.count
-            // })
-            if (evicted != null) {
-                this.count[min].delete(evicted)
-                this.cache.delete(evicted)
-                this.keyCount.delete(evicted)
-            } else {
-                return false;
-            }
-        } else {
-            this.capacity -= 1
-        }
-    } else {
-        
-        // remove from old set
-        this.count[keyCount-1].delete(key)
-    }
-    // add to new set
-    if (this.count[keyCount] == null) {
-        this.count[keyCount] = new Set()
-    }
-    this.count[keyCount].add(key)
-     this.keyCount.set(key, keyCount + 1)
-    return true
-};
+function freqAddOne(keyToFreqMap, freqToKeyMap, key, leastFreq) {
+  // Add this key to our cache
+  // update keyToFreqMap
+  var freq = keyToFreqMap.get(key) + 1 || 1;
+  keyToFreqMap.set(key, freq);
 
+  // update freqToKeyMap
+  if (freq > 1) {
+    var oldFreq = freq - 1;
+    var oldFreqSet = freqToKeyMap.get(oldFreq);
+    oldFreqSet.delete(key);
+    if (oldFreqSet.size === 0) {
+      freqToKeyMap.delete(oldFreq)
+      if (oldFreq === leastFreq) leastFreq++;
+    }
+  }
+  var set = freqToKeyMap.get(freq) || new Set();
+  set.add(key);
+  freqToKeyMap.set(freq, set);
+  return leastFreq;
+}
 ```
