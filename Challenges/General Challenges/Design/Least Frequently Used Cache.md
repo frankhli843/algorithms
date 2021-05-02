@@ -300,7 +300,7 @@ class LFUCache {
 
 </details>
 
-<details><summary>second iteration: hashmap, hashmap, double linked list, least frequently used counter 220ms</summary>
+<details><summary>third iteration: hashmap, hashmap, double linked list, least frequently used counter 220ms</summary>
  - In this iteration I got the insight that I can keep track of the least frequent list instead of having to sort it each time
  
  ```js
