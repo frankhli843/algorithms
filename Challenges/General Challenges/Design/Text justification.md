@@ -54,6 +54,7 @@ words[i] consists of only English letters and symbols.
 1 <= maxWidth <= 100
 words[i].length <= maxWidth
 ```
+<details><summary>68 ms</summary>
 
 # 68 ms submission
 ```js
@@ -89,6 +90,11 @@ var fullJustify = function(words, maxWidth) {
 };
 
 ```
+
+</details>
+
+<details><summary>64 ms</summary>
+
 # 64 ms submission
 ```js
 function fullJustify(words, maxWidth) {
@@ -140,6 +146,10 @@ function fullJustify(words, maxWidth) {
 }
 ```
 
+</details>
+
+<details><summary>60 ms</summary>
+
 # 60 ms submission
 ```js
 var fullJustify = function(words, maxWidth) {
@@ -174,3 +184,5 @@ var fullJustify = function(words, maxWidth) {
 };
 
 ```
+
+</details>
