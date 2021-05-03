@@ -282,26 +282,33 @@ class LFUCache {
     count;
     
     constructor(capacity){
+        // console.log(`l = new LFUCache(${capacity})`)
         this.capacity = capacity; 
         this.countHash = {};  // {capacity: Node[]}
         this.hash = {}; // {first: Node, last: Node}
         this.count = 0;
+        this.leastFreqCount = 1;
     }
     put(key, value){
-        if (this.capacity === 0) return; // no capacity so we don't need anything
+        // console.log(`l.put(${key}, ${value})`)
+        // no capacity so we don't need anything
+        if (this.capacity === 0) return;
         
         // case 1: new value
         if (!(key in this.hash)){ 
             // case 1.1: over capacity, remove the least used
             if (this.capacity === this.count){ // here we have a list of each count
-                const leastUsedCount = Object.keys(this.countHash).sort((a,b) => a - b)[0];  // get the smallest count
-                const keyToDelete = this.countHash[leastUsedCount].first.key;
-                this.countHash[leastUsedCount].first = this.countHash[leastUsedCount].first.next;
-                if (this.countHash[leastUsedCount].first) this.countHash[leastUsedCount].first.parent = null;       
-                // if there is now nothing pointing at the given count then we can remove this.countHash[leastUsedCount]
-                if (!this.countHash[leastUsedCount].first) delete this.countHash[leastUsedCount];
+                const keyToDelete = this.countHash[this.leastFreqCount].first.key;
+                this.countHash[this.leastFreqCount].first = this.countHash[this.leastFreqCount].first.next;
+                if (this.countHash[this.leastFreqCount].first) this.countHash[this.leastFreqCount].first.parent = null;       
+                // if there is now nothing pointing at the given count then we can remove this.countHash[this.leastFreqCount]
+                if (!this.countHash[this.leastFreqCount].first) { 
+                    delete this.countHash[this.leastFreqCount];
+                    this.leastFreqCount++; // we know that the least frequent is now the next
+                }
                 delete this.hash[keyToDelete];  // remove from hash
                 this.count--;
+                
             }
             
             // create new node and add it 
@@ -318,6 +325,7 @@ class LFUCache {
                 this.countHash[1] = { first: this.hash[key], last: this.hash[key] }; 
     
             this.count++;
+            this.leastFreqCount = 1; // since we just added a new node
         }
         // case 2: existing value
         else {
@@ -325,6 +333,8 @@ class LFUCache {
             this.incrementCount(key);
         }
     }
+    
+    
     
     /** 
      * @param {number} key
@@ -344,7 +354,8 @@ class LFUCache {
         const originalCount = originalNode.count;
         this.hash[key].count++;
         const newCount = this.hash[key].count;
-      
+        
+
         // Adding into new count list
         if (!(newCount in this.countHash)) { // count does not exist right now
             this.countHash[newCount] = {first: this.hash[key], last: this.hash[key]};
@@ -358,8 +369,11 @@ class LFUCache {
 
         // we will filter out the original node from the original count linkedlist 
         // case 1: if the linkedlist has the node as first and last then its the only node so we remove the list all together
-        if (this.countHash[originalCount].first.key === key && this.countHash[originalCount].last.key === key) 
+        if (this.countHash[originalCount].first.key === key && this.countHash[originalCount].last.key === key){
             delete this.countHash[originalCount];
+            if (this.leastFreqCount === originalCount) this.leastFreqCount++;
+        }
+            
         // case 2: otherwise we need to remove it from the linkedlist
         else {  
             // case 2.1: first of the list
@@ -379,7 +393,9 @@ class LFUCache {
             }
         } 
     }
+   
 }
+
 ```
 
 </details>
