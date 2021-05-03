@@ -29,7 +29,7 @@ Output:
   "shall be        "
 ]
 Explanation: Note that the last line is "shall be    " instead of "shall     be", because the last line must be left-justified instead of fully-justified.
-Note that the second line is also left-justified becase it contains only one word.
+Note that the second line is also left-justified because it contains only one word.
 ```
 
 ## Example 3:
