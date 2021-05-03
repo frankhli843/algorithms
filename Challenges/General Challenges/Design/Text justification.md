@@ -9,7 +9,7 @@
     - The input array words contains at least one word.
 
 ## Example 1:
-```js
+```
 Input: words = ["This", "is", "an", "example", "of", "text", "justification."], maxWidth = 16
 Output:
 [
@@ -20,7 +20,7 @@ Output:
 ```
 
 ## Example 2:
-```js
+```
 Input: words = ["What","must","be","acknowledgment","shall","be"], maxWidth = 16
 Output:
 [
@@ -33,7 +33,7 @@ Note that the second line is also left-justified becase it contains only one wor
 ```
 
 ## Example 3:
-```js
+```
 Input: words = ["Science","is","what","we","understand","well","enough","to","explain","to","a","computer.","Art","is","everything","else","we","do"], maxWidth = 20
 Output:
 [
@@ -47,7 +47,7 @@ Output:
 ```
 
 ##Constraints:
-```js
+```
 1 <= words.length <= 300
 1 <= words[i].length <= 20
 words[i] consists of only English letters and symbols.
