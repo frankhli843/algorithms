@@ -423,7 +423,7 @@ class LFUCache {
                 this.cache.delete(keyToRemove);
                 this.keyCount.delete(keyToRemove);
             } 
-            else return false;  
+            else return false; 
         else this.capacity--;  // we just add one in since there is still room
     }
     else this.countSets[keyCount-1].delete(key); // remove from old set since we will be moving to new set, we subtract 1 here b/c of indexing
