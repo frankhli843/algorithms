@@ -146,6 +146,7 @@ function fullJustify(words, maxWidth) {
 }
 ```
 
+
 </details>
 
 <details><summary>60 ms</summary>
@@ -183,6 +184,43 @@ var fullJustify = function(words, maxWidth) {
     return res;
 };
 
+```
+
+```
+Console output
+fullJustify([This,is,an,example,of,text,justification.], 16)
+[
+  [ 'This', 'is', 'an', letters: 8 ],
+  [ 'example', 'of', 'text', letters: 13 ],
+  [ 'justification.', letters: 14 ]
+]
+============ second loop =============
+row: [This,is,an]
+    row length: 3
+    joined row: This,is,an
+    line: 'This'
+       spaces: 8
+       min spaces: 4
+       row[w]: 'is'
+          add spaces: 0
+          modded line: 'This    is'
+       row[w]: 'an'
+          add spaces: 0
+          modded line: 'This    is    an'
+row: [example,of,text]
+    row length: 3
+    joined row: example,of,text
+    line: 'example'
+       spaces: 3
+       min spaces: 1
+       row[w]: 'of'
+          add spaces: 1
+          modded line: 'example  of'
+       row[w]: 'text'
+          add spaces: 1
+          modded line: 'example  of text'
+row: [justification.]
+    row length: 1
 ```
 
 # Single pass
