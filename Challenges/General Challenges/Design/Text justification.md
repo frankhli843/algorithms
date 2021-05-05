@@ -96,6 +96,7 @@ var fullJustify = function(words, maxWidth) {
 <details><summary>64 ms</summary>
 
 # 64 ms submission
+
 ```js
 function fullJustify(words, maxWidth) {
     const res = [[]];
