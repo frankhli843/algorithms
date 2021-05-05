@@ -98,52 +98,36 @@ var fullJustify = function(words, maxWidth) {
 # 64 ms submission
 ```js
 function fullJustify(words, maxWidth) {
-    let output = [],
-    currentWords = [],
-    currentLength = 0
-
-    for (let i = 0; i < words.length; i++) {
-        // can fit current word into this line
-        if (currentLength + words[i].length + currentWords.length <= maxWidth) {
-            currentLength = currentLength + words[i].length
-            currentWords.push(words[i])
-        // cannot fit current word into this line
-        // add spaces between words and add to solution set
-        } else {
-            //console.log(currentLength)
-            //console.log(currentWords)
-            while (currentLength < maxWidth) {
-                if (currentWords.length === 1) {
-                    currentWords[0] += ' '
-                    currentLength++
-                } else {
-                    for (let wIndex = 0; wIndex < currentWords.length-1; wIndex++) {
-                        currentWords[wIndex] += ' '
-                        currentLength++
-                        if (currentLength === maxWidth) {
-                            break
-                        }
-                    }
-                }
-            }
-            output.push(currentWords.join(''))
-            currentWords = [words[i]]
-            currentLength = words[i].length
+    const res = [[]];
+    res[0].letters = 0;
+    for (let word of words) {  // first we go through and figure out how many words we can fit in a given row
+        let row = res[res.length - 1];
+        if (row.length && row.letters + row.length + word.length > maxWidth) {  // new row condition each word will need at least one space 
+            res.push([]);
+            row = res[res.length - 1];  // really creative way of getting the latest list
+            row.letters = 0;  // I learned that you can do this since it is an object
         }
+        row.push(word);
+        row.letters += word.length;
     }
-
-    // add last words if needed
-    if (currentWords.length >= 1) {
-        let lastWord = currentWords.join(' ')
-        // pad rest of word with space
-        while (lastWord.length < maxWidth) {
-            lastWord += ' '
+    for (let r = 0; r < res.length; r++) {
+        let row = res[r];  // ['firstWord', 'secondWord', ...] 
+        if (row.length === 1 || r === res.length - 1) {  // if its the last row then we left justify
+            res[r] = row.join(' ') + ' '.repeat(maxWidth - row.letters - row.length + 1);
+            continue;
         }
-        output.push(lastWord)
+        let line = row[0];  // start with the first word
+        let spaces = maxWidth - row.letters;  // this is the total spaces possible
+        let minSpaces = ' '.repeat(Math.floor(spaces / (row.length - 1)));
+        let addSpace = spaces % (row.length - 1);
+        
+        for (let w = 1; w < row.length; w++) {
+            line += minSpaces + (w <= addSpace ? ' ' : '') + row[w];
+        }
+        res[r] = line;
     }
-
-    return output
-}
+    return res;
+};
 ```
 
 
