@@ -204,5 +204,71 @@ var fullJustify = function(words, maxWidth) {
 };
 ```
 
+```js
+/**
+ * @param {string[]} words
+ * @param {number} maxWidth
+ * @return {string[]}
+
+ example
+ "a  b ab"
+ 2  1, total space: 7
+ "aa  bab"
+ 2 spaces
+ "c      "
+ 6 spaces
+ */
+function fullJustify(words, maxWidth) {
+  let wordCharCount = 0;  // the number of characters taken up by the words without considering spaces
+  const rows = [[]];
+  const resultList = [];
+
+  // step 1: separate the words into a nested list where each subarray is a given row 
+  for (let word of words){
+    const row = rows[rows.length-1];
+    // case 1: next word puts it over the limit so we need a new row
+    // min number of spaces is number of words - 1 which is row.length - 1 + 1 b/c of additional word
+    if ((wordCharCount + row.length + word.length) >= maxWidth){
+      row.wordCharCount = wordCharCount;
+      wordCharCount = word.length;
+      rows.push([word]);
+    }
+    // case 2: we can still add the word
+    else {
+      wordCharCount += word.length;
+      row.push(word);
+    }
+  }
+
+  // step 2: given each row calculate the spaces and append them to a strin
+  rows.forEach((row, i) => {
+    // case 1: is left row then just justify left
+    if (i === rows.length -1){
+      const leftGathered = row.join(" "); // e.g. "c d"
+      const spaceRight = " ".repeat(maxWidth - leftGathered.length);
+      resultList.push(leftGathered + spaceRight);
+    }
+    // case 2: otherwise justify but give extra space to the most left 
+    else {
+      // remaining characters / number of gaps
+      // = (maxWidth - wordCharCount) % (number of words - 1)
+      const spacesPerGap = Math.floor((maxWidth - row.wordCharCount)/(row.length -1));
+      const extraOddSpaces = (maxWidth - row.wordCharCount)%(row.length -1);
+      let rowString = "";
+      for (let i = 0; i< row.length; i++){
+        // first gap gets the extra spaces
+        if (i === 0) rowString += row[i] + " ".repeat(spacesPerGap + extraOddSpaces)
+        // last word gets no spaces afterwards
+        else if (i === row.length - 1) rowString += row[i];
+        // middle gets the spacesPerGap
+        else rowString += row[i] + " ".repeat(spacesPerGap)
+      }
+      resultList.push(rowString);
+    }
+  })
+  return resultList;
+};
+
+```
 </details>
 
