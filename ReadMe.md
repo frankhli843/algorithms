@@ -29,6 +29,7 @@ marp: false
     - .map will return undefined for anything not returned use .filter(a) to removed that. Note though that this will remove 0
 - When in doubt start with brute force and then optimize by logically restricting.
 - If you are taking a pointers approach than set up the number of points required for a given calculation.
+- Be careful when calculating and you are dividing by length. Could be 0.
 
 # JS Fiddle template
 ```js

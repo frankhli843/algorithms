@@ -203,7 +203,7 @@ var fullJustify = function(words, maxWidth) {
     }
 };
 ```
-
+- Personal Attempt
 ```js
 /**
  * @param {string[]} words
@@ -228,7 +228,7 @@ function fullJustify(words, maxWidth) {
     const row = rows[rows.length-1];
     // case 1: next word puts it over the limit so we need a new row
     // min number of spaces is number of words - 1 which is row.length - 1 + 1 b/c of additional word
-    if ((wordCharCount + row.length + word.length) >= maxWidth){
+    if ((wordCharCount + row.length + word.length) > maxWidth){
       row.wordCharCount = wordCharCount;
       wordCharCount = word.length;
       rows.push([word]);
@@ -240,9 +240,9 @@ function fullJustify(words, maxWidth) {
     }
   }
 
-  // step 2: given each row calculate the spaces and append them to a strin
+  // step 2: given each row calculate the spaces and append them to a string
   rows.forEach((row, i) => {
-    // case 1: is left row then just justify left
+    // case 1: is last row then just justify left
     if (i === rows.length -1){
       const leftGathered = row.join(" "); // e.g. "c d"
       const spaceRight = " ".repeat(maxWidth - leftGathered.length);
@@ -252,22 +252,32 @@ function fullJustify(words, maxWidth) {
     else {
       // remaining characters / number of gaps
       // = (maxWidth - wordCharCount) % (number of words - 1)
-      const spacesPerGap = Math.floor((maxWidth - row.wordCharCount)/(row.length -1));
-      const extraOddSpaces = (maxWidth - row.wordCharCount)%(row.length -1);
+      const spacesPerGap = Math.floor((maxWidth - row.wordCharCount)/(row.length -1 || 1));
+      let extraOddSpaces = (maxWidth - row.wordCharCount) % (row.length -1 || 1);
       let rowString = "";
       for (let i = 0; i< row.length; i++){
-        // first gap gets the extra spaces
-        if (i === 0) rowString += row[i] + " ".repeat(spacesPerGap + extraOddSpaces)
+        const word = row[i];
+
+        // middle or only word gets the spacesPerGap 
+        if (i !== row.length - 1 || row.length ===1) {
+          rowString += row[i] + " ".repeat(spacesPerGap);
+          if (extraOddSpaces){
+            extraOddSpaces--;
+            rowString += " ";
+          }
+        }
         // last word gets no spaces afterwards
-        else if (i === row.length - 1) rowString += row[i];
-        // middle gets the spacesPerGap
-        else rowString += row[i] + " ".repeat(spacesPerGap)
+        else {
+          rowString += row[i];
+
+        }
       }
       resultList.push(rowString);
     }
   })
   return resultList;
 };
+
 
 ```
 </details>
