@@ -1,3 +1,5 @@
+# Unique Emails
+
 Every valid email consists of a local name and a domain name, separated by the '@' sign. Besides lowercase letters, the email may contain one or more '.' or '+'.
 
 For example, in "alice@leetcode.com", "alice" is the local name, and "leetcode.com" is the domain name.
@@ -13,8 +15,9 @@ Given an array of strings emails where we send one email to each email[i], retur
 
 
 
-Example 1:
+## Examples
 
+```js
 Input: emails = ["test.email+alex@leetcode.com","test.e.mail+bob.cathy@leetcode.com","testemail+david@lee.tcode.com"]
 Output: 2
 Explanation: "testemail@leetcode.com" and "testemail@lee.tcode.com" actually receive mails.
@@ -22,16 +25,21 @@ Example 2:
 
 Input: emails = ["a@leetcode.com","b@leetcode.com","c@leetcode.com"]
 Output: 3
+```
 
 
-Constraints:
 
+## Constraints
+```js
 1 <= emails.length <= 100
 1 <= emails[i].length <= 100
 email[i] consist of lowercase English letters, '+', '.' and '@'.
-Each emails[i] contains exactly one '@' character.
-All local and domain names are non-empty.
-Local names do not start with a '+' character.
+    Each emails[i] contains exactly one '@' character.
+    All local and domain names are non-empty.
+    Local names do not start with a '+' character.
+```
+
+
 <details><summary>Solution</summary>
 
 
