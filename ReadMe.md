@@ -7,10 +7,6 @@ marp: false
 - If you notice any bugs please submit a ticket!
 
 
-
-
-![img](img/sharpen.jpg)
-
 # Table of Contents
 - These are sorted by the optimial solution used
 - [Design](https://github.com/frankhli843/algorithms/tree/master/Challenges/General%20Challenges/Design)
