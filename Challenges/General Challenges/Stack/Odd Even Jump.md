@@ -54,48 +54,83 @@ Explanation: We can reach the end from starting indices 1, 2, and 4.
 0 <= arr[i] < 105
 
 # Solution 
+https://leetcode.com/problems/odd-even-jump/discuss/217981/JavaC%2B%2BPython-DP-using-Map-or-Stack
+
+odd jumps go high need to know the smallest after current
+even jumps go low need to know the largest after current
+We need to jump higher and lower alternately to the end.
+
+Take [5,1,3,4,2] as example.
+
+If we start at 2,
+we can jump either higher first or lower first to the end,
+because we are already at the end.
+higher(2) = true
+lower(2) = true
+
+If we start at 4,
+we can't jump higher, higher(4) = false
+we can jump lower to 2, lower(4) = higher(2) = true
+
+If we start at 3,
+we can jump higher to 4, higher(3) = lower(4) = true
+we can jump lower to 2, lower(3) = higher(2) = true
+
+If we start at 1,
+we can jump higher to 2, higher(1) = lower(2) = true
+we can't jump lower, lower(1) = false
+
+If we start at 5,
+we can't jump higher, higher(5) = false
+we can jump lower to 4, lower(5) = higher(4) = false
+
+
+Complexity
+Time O(NlogN)
+Space O(N)
+
+# Implementation 1: 280 ms, 51.4 mb
 ```js
 /**
- * @param {number[]} arr
- * @return {number}
- 
- odd jumps go high need to know the smallest after current
- even jumps go low need to know the largest after current
- 
+ Runtime: 280 ms, faster than 59.13% of JavaScript online submissions for Odd Even Jump.
+ Memory Usage: 51.4 MB, less than 26.09% of JavaScript online submissions for Odd Even Jump.
  */
 
 function oddEvenJumps(arr) {
-    const n = arr.length;
-    const nextHigher = new Array(n).fill(0), nextLower = new Array(n).fill(0);
+    if (arr.length === 1) return 1;
     
-    let stack = [];
+    const n = arr.length;
     
     // nextHigher is an array where each index represents the next higher index for the corresponding index in our arr
     // [10, 13, 12, 14, 15 ] <= input
     // [ 0, 4,   3,  0,  0 ] <= nextHigher, each value represents the index for the next higher number or else 0
     // this runs in 3n 
-    arr.map((a, i) => { return { value: a, i: i }})
-        .sort((a,b) => a.value - b.value)
-        .forEach(obj => {
-            while (stack.length && stack[stack.length-1] < obj.i) nextHigher[stack.pop()] = obj.i;
-            stack.push(obj.i);
-        });
-    
-    
-    // nextLower is an array where each index represents the next lower index for the corresponding index in our arr
-    // this runs in 3n
-    stack = [];
-    arr.map((a, i) => { return { value: a, i: i }})
-        .sort((a,b) => b.value - a.value)
-        .forEach(obj => {
-            while (stack.length && stack[stack.length-1] < obj.i) nextLower[stack.pop()] = obj.i;
-            stack.push(obj.i);
-        });
+    const nextHigher = new Array(n).fill(0), nextLower = new Array(n).fill(0);
+    const fillNextIndexArray = (arrayToFill, sortCallback) => {
+        const stack = [];
+        arr.map((value, i) => { return {value: value, i: i} })
+            .sort(sortCallback)
+            .forEach((obj) => {
+                while (stack.length && stack[stack.length - 1] < obj.i)
+                    arrayToFill[stack.pop()] = obj.i;
+                stack.push(obj.i);
+            });
+    };
+    fillNextIndexArray(nextHigher, (a, b) => a.value - b.value );
+    fillNextIndexArray(nextLower, (a, b) => b.value - a.value );
     
     // runs in O(n)
     // higher and lower will an array where each indice will be 0 or 1. If 1 it means that it is a good starting index
     const higherOddJump = new Array(n).fill(0), lowerEvenJump = new Array(n).fill(0);  
     [higherOddJump[n-1], lowerEvenJump[n-1]] = [1, 1] // the last index is always a valid choice
+    
+    /**
+     loop through backwards skipping the first.
+     For all i,j in the set of valid indices
+     if i < j then the state of whether j is a good index is already known since we
+     know the state of the last index and we are working backwards.
+     Thus to determine to state i we simply need to find out whether there is a good index
+     */
     for (let i = n-2; i > -1; i--){
         // determine if the current index can arrive at the end by going higher, odd jump 
         higherOddJump[i] = lowerEvenJump[nextHigher[i]]; 
@@ -106,6 +141,4 @@ function oddEvenJumps(arr) {
     // We only consider odd jumps since a starting jump has to always be odd
     return higherOddJump.reduce((a,b) => a + b, 0)
 };
-
-oddEvenJumps([5,1,3,4,2])
 ```
